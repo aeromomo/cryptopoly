@@ -110,11 +110,11 @@ body{background:var(--bg);color:#d0d8e8;font-family:'Inter',sans-serif;overflow-
 </head>
 <body>
 <div class="titan-bg">
-  <img class="titan trump" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/January_2025_Official_Presidential_Portrait_of_Donald_J._Trump.jpg/600px-January_2025_Official_Presidential_Portrait_of_Donald_J._Trump.jpg" alt="">
-  <img class="titan elon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Elon_Musk_%2854816836217%29_%28cropped_close%29.jpg/500px-Elon_Musk_%2854816836217%29_%28cropped_close%29.jpg" alt="">
-  <img class="titan cz" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Changpeng_Zhao_in_2022.jpg/400px-Changpeng_Zhao_in_2022.jpg" alt="">
-  <img class="titan vitalik" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Vitalik_Buterin_TechCrunch_London_2015_%28cropped%29.jpg/500px-Vitalik_Buterin_TechCrunch_London_2015_%28cropped%29.jpg" alt="">
-  <img class="titan satoshi" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Hacker-3342696_1920-1024x788.jpg/600px-Hacker-3342696_1920-1024x788.jpg" alt="">
+  <img class="titan trump" src="img/trump.jpg" alt="">
+  <img class="titan elon" src="img/elon.jpg" alt="">
+  <img class="titan cz" src="img/cz.jpg" alt="">
+  <img class="titan vitalik" src="img/vitalik.jpg" alt="">
+  <img class="titan satoshi" src="img/satoshi.jpg" alt="">
 </div>
 <div class="content">
 <div class="hero"><h1>CRYPTOPOLY</h1><div class="sub">THE CRYPTO BOARD GAME</div></div>
@@ -163,7 +163,7 @@ function mkL(name){
 
 (function(){
   const b=document.getElementById('board');
-  b.innerHTML=`<div class="center"><div class="ct-faces"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/January_2025_Official_Presidential_Portrait_of_Donald_J._Trump.jpg/300px-January_2025_Official_Presidential_Portrait_of_Donald_J._Trump.jpg"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Elon_Musk_%2854816836217%29_%28cropped_close%29.jpg/300px-Elon_Musk_%2854816836217%29_%28cropped_close%29.jpg"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Changpeng_Zhao_in_2022.jpg/300px-Changpeng_Zhao_in_2022.jpg"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Vitalik_Buterin_TechCrunch_London_2015_%28cropped%29.jpg/300px-Vitalik_Buterin_TechCrunch_London_2015_%28cropped%29.jpg"></div><div class="ct">CRYPTOPOLY</div><div class="csb">THE CRYPTO BOARD GAME</div><div class="decks"><div class="dk wp"><span class="di">📄</span>White Paper<span class="dl">16 CARDS</span></div><div class="dk al"><span class="di">🎲</span>Alpha<span class="dl">16 CARDS</span></div></div></div>`;
+  b.innerHTML=`<div class="center"><div class="ct-faces"><img src="img/trump.jpg"><img src="img/elon.jpg"><img src="img/cz.jpg"><img src="img/vitalik.jpg"></div><div class="ct">CRYPTOPOLY</div><div class="csb">THE CRYPTO BOARD GAME</div><div class="decks"><div class="dk wp"><span class="di">📄</span>White Paper<span class="dl">16 CARDS</span></div><div class="dk al"><span class="di">🎲</span>Alpha<span class="dl">16 CARDS</span></div></div></div>`;
   SQ.forEach(sq=>{
     const[r,c]=GP[sq.id];const s=r===1?'t':r===11?'b':c===1?'l':c===11?'r':'';
     const e=document.createElement('div');e.className='c';e.style.gridRow=r;e.style.gridColumn=c;e.setAttribute('data-s',s);let h='';

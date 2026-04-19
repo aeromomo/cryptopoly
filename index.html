@@ -674,7 +674,7 @@ function buildTicker(trackId){
   el.innerHTML=html;
 }
 
-(function(){
+function initGame(){
   const b=document.getElementById('board');
   // Center with JoJo titan aurals
   b.innerHTML=`<div class="center">
@@ -759,7 +759,7 @@ function buildTicker(trackId){
 
   // casino marquee idle chase (slow)
   startIdleChase();
-})();
+}
 
 function placeToken(pos,animate=false){
   const sqEl=document.querySelector(`.c[data-sqid="${pos}"]`);
@@ -1139,6 +1139,9 @@ function startIdleChase(){
 
 // replace token on resize
 window.addEventListener('resize',()=>{if(window.playerPos!==undefined)placeToken(window.playerPos)});
+
+// ═══ START GAME (after all definitions are done) ═══
+initGame();
 </script>
 </body>
 </html>

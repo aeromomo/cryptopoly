@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRYPTOPOLY</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&family=Press+Start+2P&family=Bungee&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 <style>
 :root{--bg:#030508;--gold:#f7931a;--p5-red:#E11D48;--p5-ink:#0a0a0a}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -529,6 +531,22 @@ function buildTicker(trackId){
   buildTicker('ticker-track');
   buildTicker('ticker-track-2');
 
+  // === GSAP ENTRANCE + JOJO AURAS ===
+  if(window.gsap){
+    gsap.from('.hero h1',{duration:1.2,y:-60,opacity:0,rotation:-10,ease:'back.out(1.7)'});
+    gsap.from('.hero .sub',{duration:.8,y:20,opacity:0,delay:.4,ease:'back.out(2)'});
+    gsap.from('.board',{duration:1,scale:.85,opacity:0,delay:.3,ease:'power3.out'});
+    gsap.from('.jojo',{duration:1,scale:0,opacity:0,rotation:180,stagger:.15,delay:1,ease:'back.out(1.7)'});
+    // each titan: custom aura pulse
+    gsap.to('.jojo.trump',{scale:1.08,duration:1.8,yoyo:true,repeat:-1,ease:'sine.inOut'});
+    gsap.to('.jojo.elon',{scale:1.06,duration:2.1,yoyo:true,repeat:-1,ease:'sine.inOut',delay:.3});
+    gsap.to('.jojo.cz',{scale:1.07,duration:1.9,yoyo:true,repeat:-1,ease:'sine.inOut',delay:.5});
+    gsap.to('.jojo.vitalik',{scale:1.06,duration:2.3,yoyo:true,repeat:-1,ease:'sine.inOut',delay:.7});
+    gsap.to('.jojo.satoshi',{scale:1.1,duration:2.5,yoyo:true,repeat:-1,ease:'sine.inOut',delay:.4});
+    // cards stagger entrance on load
+    gsap.from('.gc',{duration:.5,y:30,opacity:0,stagger:.04,ease:'back.out(1.5)',delay:.5,scrollTrigger:null});
+  }
+
   // === ADD PLAYER TOKEN ===
   const token=document.createElement('div');
   token.className='token';
@@ -542,15 +560,50 @@ function buildTicker(trackId){
   startIdleChase();
 })();
 
-function placeToken(pos){
+function placeToken(pos,animate=false){
   const sqEl=document.querySelector(`.c[data-sqid="${pos}"]`);
   if(!sqEl)return;
   const token=document.getElementById('player-token');
   const board=document.getElementById('board');
   const br=board.getBoundingClientRect();
   const sr=sqEl.getBoundingClientRect();
-  token.style.left=(sr.left-br.left+sr.width/2-token.offsetWidth/2)+'px';
-  token.style.top=(sr.top-br.top+sr.height/2-token.offsetHeight/2)+'px';
+  const x=sr.left-br.left+sr.width/2-token.offsetWidth/2;
+  const y=sr.top-br.top+sr.height/2-token.offsetHeight/2;
+  if(animate && window.gsap){
+    gsap.to(token,{left:x,top:y,duration:.22,ease:'back.out(2.5)'});
+    gsap.fromTo(token,{scale:.8},{scale:1.15,duration:.1,yoyo:true,repeat:1});
+  }else{
+    token.style.left=x+'px';
+    token.style.top=y+'px';
+  }
+}
+
+// === CONFETTI EFFECTS ===
+function landBoom(pos){
+  if(!window.confetti)return;
+  const sqEl=document.querySelector(`.c[data-sqid="${pos}"]`);
+  if(!sqEl)return;
+  const r=sqEl.getBoundingClientRect();
+  const x=(r.left+r.width/2)/window.innerWidth,y=(r.top+r.height/2)/window.innerHeight;
+  const sq=(window.SQ_DATA||[])[pos];
+  if(sq&&(sq.n==='Bitcoin'||sq.n==='Ethereum')){
+    // LEGENDARY rainbow blast
+    confetti({particleCount:200,spread:140,startVelocity:50,origin:{x,y},colors:['#FFD700','#FF6B00','#627EEA','#14F195','#E11D48','#F7931A']});
+    setTimeout(()=>confetti({particleCount:100,spread:80,origin:{x,y},colors:['#FFD700','#FF6B00']}),300);
+  }else if(sqEl.getAttribute('data-mode')==='pump'){
+    // pump - green money rain
+    confetti({particleCount:120,spread:90,startVelocity:45,origin:{x,y},colors:['#00ff66','#00cc44','#44ff88','#22dd55']});
+  }else if(sqEl.getAttribute('data-mode')==='dump'){
+    // dump - red debris
+    confetti({particleCount:80,spread:100,startVelocity:30,gravity:2,origin:{x,y},colors:['#ff3333','#cc0000','#880000'],shapes:['square']});
+  }else if(sq&&sq.t==='wp'){
+    confetti({particleCount:60,spread:70,origin:{x,y},colors:['#3884f4','#6BA3F7','#1E5FC7']});
+  }else if(sq&&sq.t==='al'){
+    confetti({particleCount:60,spread:70,origin:{x,y},colors:['#ef5350','#F77570','#c62828']});
+  }else{
+    // regular gold burst
+    confetti({particleCount:60,spread:70,origin:{x,y},colors:['#FFD700','#FFA500','#FF6B00']});
+  }
 }
 
 // === AUDIO (biubiubiu) ===
@@ -614,10 +667,17 @@ async function walkSteps(n){
       sqEl.classList.add('walk-flash');
       setTimeout(()=>sqEl.classList.remove('walk-flash'),200);
     }
-    placeToken(pos);
+    placeToken(pos,true);
     biu(600+(i*30),.06);
     dd.textContent=`🚶 STEP ${i+1}/${n}`;
-    await new Promise(r=>setTimeout(r,220));
+    // check pass GO
+    if(pos===0&&i>0){
+      dd.textContent=`✈️ AIRDROP! +200 USDT`;
+      if(window.confetti){
+        confetti({particleCount:100,spread:80,origin:{x:.5,y:.5},colors:['#14F195','#0FBA6E','#FFD700']});
+      }
+    }
+    await new Promise(r=>setTimeout(r,230));
   }
   // LANDED
   const landedSq=document.querySelector(`.c[data-sqid="${window.playerPos}"]`);
@@ -626,9 +686,16 @@ async function walkSteps(n){
     setTimeout(()=>landedSq.classList.remove('land-flash'),1200);
   }
   jackpot();
+  landBoom(window.playerPos);
   const sq=(window.SQ_DATA||[])[window.playerPos];
-  if(sq)dd.textContent=`📍 ${sq.n||'?'}`;
-  setTimeout(()=>{document.getElementById('roll-btn').disabled=false;isRolling=false},1400);
+  if(sq){
+    let label=sq.n||'?';
+    if(landedSq&&landedSq.getAttribute('data-mode')==='pump')label='🚀 '+label+' PUMP!';
+    else if(landedSq&&landedSq.getAttribute('data-mode')==='dump')label='💀 '+label+' DUMP!';
+    else if(sq.n==='Bitcoin'||sq.n==='Ethereum')label='👑 '+label;
+    dd.textContent='📍 '+label;
+  }
+  setTimeout(()=>{document.getElementById('roll-btn').disabled=false;isRolling=false},1600);
 }
 
 // === IDLE CASINO MARQUEE CHASE ===

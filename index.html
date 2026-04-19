@@ -312,6 +312,48 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 
 .footer{text-align:center;padding:50px;color:#0a0e16;font-size:11px;letter-spacing:3px;font-family:'Bebas Neue'}
 
+/* ═══════════ CHARACTER SELECT ═══════════ */
+.char-overlay{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at center,rgba(20,10,30,.96),rgba(3,5,8,.99));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;overflow-y:auto}
+.char-overlay.hidden{display:none}
+.char-overlay::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(247,147,26,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(247,147,26,.04) 1px,transparent 1px);background-size:40px 40px;z-index:0;pointer-events:none}
+.char-title{font-family:'Bebas Neue';font-size:clamp(36px,7vw,72px);color:#fff;letter-spacing:6px;text-shadow:5px 5px 0 var(--p5-red),10px 10px 0 #000,0 0 40px rgba(225,29,72,.5);transform:rotate(-2deg);margin-bottom:10px;z-index:2;text-align:center;line-height:.9}
+.char-sub{font-family:'Bebas Neue';color:#fff;background:var(--p5-red);padding:6px 24px;letter-spacing:4px;font-size:16px;transform:skew(-10deg);box-shadow:4px 4px 0 #000;margin-bottom:30px;z-index:2}
+.char-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:900px;width:100%;z-index:2}
+@media(max-width:600px){.char-grid{grid-template-columns:1fr}}
+.char-card{position:relative;background:linear-gradient(145deg,rgba(12,18,30,.95),rgba(6,10,18,.95));border:3px solid var(--aura);border-radius:16px;padding:20px;cursor:pointer;transition:transform .3s cubic-bezier(.25,.8,.25,1),box-shadow .3s;box-shadow:6px 6px 0 #000,0 0 30px var(--aura);overflow:hidden}
+.char-card::before{content:'';position:absolute;inset:-30%;background:conic-gradient(from 0deg, var(--aura), transparent 30%, var(--aura), transparent 60%, var(--aura));filter:blur(20px);opacity:.3;z-index:0;animation:aura-spin 8s linear infinite}
+.char-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,.05) 50%,transparent 70%);pointer-events:none;z-index:1}
+.char-card:hover{transform:scale(1.05) translateY(-6px) rotate(-1deg);box-shadow:10px 10px 0 #000,0 0 60px var(--aura),0 0 120px var(--aura)}
+.char-card.selected{transform:scale(1.03);box-shadow:8px 8px 0 #000,0 0 80px var(--aura),0 0 150px var(--aura);border-width:4px}
+.char-card.selected::before{opacity:.6;animation-duration:4s}
+.char-portrait{width:120px;height:120px;border-radius:50%;border:4px solid var(--aura);margin:0 auto 14px;position:relative;z-index:2;overflow:hidden;box-shadow:0 0 30px var(--aura),inset 0 0 30px rgba(0,0,0,.3)}
+.char-portrait img{width:100%;height:100%;object-fit:cover;filter:contrast(1.15) saturate(1.1)}
+.char-name{font-family:'Bebas Neue';font-size:32px;color:var(--aura);letter-spacing:3px;text-align:center;text-shadow:3px 3px 0 #000,0 0 16px var(--aura);position:relative;z-index:2;line-height:1}
+.char-tagline{font-family:'JetBrains Mono';font-size:11px;color:#c8ceda;text-align:center;margin-top:8px;letter-spacing:1px;position:relative;z-index:2;opacity:.85}
+.char-stats{display:flex;justify-content:center;gap:12px;margin-top:10px;position:relative;z-index:2;font-size:10px;font-family:'JetBrains Mono';color:var(--aura)}
+.char-stats span{padding:2px 8px;border:1px solid var(--aura);border-radius:4px;background:rgba(0,0,0,.4)}
+.char-checkmark{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:var(--aura);color:#000;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;opacity:0;transform:scale(0);transition:all .3s;z-index:3;box-shadow:0 0 20px var(--aura)}
+.char-card.selected .char-checkmark{opacity:1;transform:scale(1)}
+
+.char-name-input{margin-top:30px;z-index:2;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:420px}
+.char-name-input input{background:rgba(0,0,0,.7);border:2px solid #FFD700;color:#fff;padding:14px 20px;font-family:'Bebas Neue';font-size:22px;letter-spacing:3px;border-radius:8px;width:100%;text-align:center;box-shadow:4px 4px 0 #000,inset 0 0 20px rgba(255,215,0,.15);outline:none;transition:all .2s}
+.char-name-input input:focus{border-color:#FF6B00;box-shadow:4px 4px 0 #000,inset 0 0 30px rgba(255,107,0,.3),0 0 40px rgba(255,107,0,.4)}
+.char-name-input input::placeholder{color:#666;letter-spacing:2px}
+.char-start-btn{font-family:'Bebas Neue';font-size:28px;letter-spacing:4px;color:#000;background:linear-gradient(135deg,#FFD700,#FF6B00);border:3px solid #000;border-radius:12px;padding:18px 48px;cursor:pointer;transition:all .15s;box-shadow:6px 6px 0 #000,0 0 40px rgba(255,215,0,.6);z-index:2;text-transform:uppercase;margin-top:8px}
+.char-start-btn:hover:not(:disabled){transform:translate(-3px,-3px);box-shadow:9px 9px 0 #000,0 0 60px rgba(255,215,0,.8)}
+.char-start-btn:active{transform:translate(3px,3px);box-shadow:3px 3px 0 #000}
+.char-start-btn:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(70%)}
+
+/* ═══════════ PLAYER INFO BADGE ═══════════ */
+.player-badge{position:fixed;top:20px;left:20px;z-index:50;display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.85);border:2px solid var(--player-aura,#FFD700);border-radius:40px;padding:6px 18px 6px 6px;box-shadow:0 0 24px var(--player-aura,#FFD700),4px 4px 0 #000;backdrop-filter:blur(8px)}
+.player-badge .pb-avatar{width:46px;height:46px;border-radius:50%;border:2px solid var(--player-aura,#FFD700);overflow:hidden;box-shadow:inset 0 0 12px rgba(0,0,0,.4)}
+.player-badge .pb-avatar img{width:100%;height:100%;object-fit:cover}
+.player-badge .pb-info{display:flex;flex-direction:column;line-height:1}
+.player-badge .pb-name{font-family:'Bebas Neue';font-size:16px;color:var(--player-aura,#FFD700);letter-spacing:2px;text-shadow:0 0 8px var(--player-aura,#FFD700)}
+.player-badge .pb-char{font-family:'JetBrains Mono';font-size:9px;color:#aaa;letter-spacing:1px;margin-top:2px}
+.player-badge .pb-money{font-family:'JetBrains Mono';font-size:12px;color:#14F195;font-weight:700;margin-top:4px;text-shadow:0 0 6px #14F195}
+@media(max-width:600px){.player-badge{top:auto;bottom:120px;left:10px;padding:4px 12px 4px 4px}.player-badge .pb-avatar{width:36px;height:36px}}
+
 /* ═══════════ ROLL BUTTON - CASINO STYLE ═══════════ */
 .roll-panel{position:fixed;bottom:30px;right:30px;z-index:100;display:flex;flex-direction:column;align-items:center;gap:12px}
 .roll-btn{font-family:'Bebas Neue';font-size:28px;letter-spacing:3px;color:#000;background:linear-gradient(135deg,#FFD700,#FF6B00);border:3px solid #000;border-radius:12px;padding:16px 36px;cursor:pointer;transition:all .15s;box-shadow:6px 6px 0 #000,0 0 30px rgba(255,215,0,.6);text-transform:uppercase}
@@ -320,10 +362,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .roll-btn:disabled{opacity:.5;cursor:not-allowed}
 .dice-display{font-family:'JetBrains Mono';font-weight:700;font-size:14px;color:#FFD700;background:rgba(0,0,0,.9);border:2px solid #FFD700;padding:6px 14px;border-radius:6px;min-width:140px;text-align:center;text-shadow:0 0 8px #FFD700}
 
-/* ═══════════ PLAYER TOKEN ═══════════ */
-.token{position:absolute;width:clamp(20px,3vmin,32px);height:clamp(20px,3vmin,32px);border-radius:50%;background:radial-gradient(circle,#FFD700,#FF6B00);border:2.5px solid #000;box-shadow:0 0 20px #FFD700,0 3px 6px rgba(0,0,0,.8);z-index:20;pointer-events:none;transition:all .18s cubic-bezier(.5,-.3,.6,1.3);display:flex;align-items:center;justify-content:center;font-size:clamp(10px,1.5vmin,16px)}
-.token::before{content:'';position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,0,.5),transparent 70%);z-index:-1;animation:token-pulse 1s ease-in-out infinite}
-@keyframes token-pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.4);opacity:1}}
+/* ═══════════ PLAYER TOKEN - CHARACTER AVATAR ═══════════ */
+.token{position:absolute;width:clamp(26px,3.6vmin,42px);height:clamp(26px,3.6vmin,42px);border-radius:50%;border:2.5px solid var(--player-aura,#FFD700);box-shadow:0 0 20px var(--player-aura,#FFD700),0 3px 8px rgba(0,0,0,.9);z-index:20;pointer-events:none;overflow:hidden;background:#000}
+.token img{width:100%;height:100%;object-fit:cover;filter:contrast(1.15) saturate(1.1)}
+.token::before{content:'';position:absolute;inset:-8px;border-radius:50%;background:conic-gradient(from 0deg,var(--player-aura,#FFD700),transparent 40%,var(--player-aura,#FFD700),transparent 80%,var(--player-aura,#FFD700));filter:blur(6px);z-index:-1;opacity:.7;animation:aura-spin 3s linear infinite}
 
 /* ═══════════ CASINO MARQUEE CHASE ═══════════ */
 .c.walk-flash{animation:walk-flash .2s ease-out}
@@ -351,6 +393,57 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 </style>
 </head>
 <body>
+
+<!-- ═══ CHARACTER SELECT OVERLAY ═══ -->
+<div id="char-select" class="char-overlay">
+  <div class="char-title">PICK YOUR DEGEN</div>
+  <div class="char-sub">CHOOSE YOUR CRYPTO TITAN</div>
+  <div class="char-grid">
+    <div class="char-card" data-char="trump" style="--aura:#FFD700">
+      <div class="char-checkmark">✓</div>
+      <div class="char-portrait"><img src="img/trump.jpg" alt="Trump"></div>
+      <div class="char-name">TRUMP</div>
+      <div class="char-tagline">THE DEALMAKER</div>
+      <div class="char-stats"><span>BOLD</span><span>MAGA</span><span>+TRUMP COIN</span></div>
+    </div>
+    <div class="char-card" data-char="elon" style="--aura:#00D4FF">
+      <div class="char-checkmark">✓</div>
+      <div class="char-portrait"><img src="img/elon.jpg" alt="Elon"></div>
+      <div class="char-name">ELON</div>
+      <div class="char-tagline">KEKIUS MAXIMUS</div>
+      <div class="char-stats"><span>MEMES</span><span>X / DOGE</span><span>+TWEET PUMPS</span></div>
+    </div>
+    <div class="char-card" data-char="cz" style="--aura:#F3BA2F">
+      <div class="char-checkmark">✓</div>
+      <div class="char-portrait"><img src="img/cz.jpg" alt="CZ"></div>
+      <div class="char-name">CZ</div>
+      <div class="char-tagline">THE EXCHANGE KING</div>
+      <div class="char-stats"><span>4</span><span>BINANCE</span><span>+FEE DISCOUNTS</span></div>
+    </div>
+    <div class="char-card" data-char="vitalik" style="--aura:#9945FF">
+      <div class="char-checkmark">✓</div>
+      <div class="char-portrait"><img src="img/vitalik.jpg" alt="Vitalik"></div>
+      <div class="char-name">VITALIK</div>
+      <div class="char-tagline">THE ETH WIZARD</div>
+      <div class="char-stats"><span>BIG BRAIN</span><span>ETHEREUM</span><span>+DEFI BUFF</span></div>
+    </div>
+  </div>
+  <div class="char-name-input">
+    <input type="text" id="name-input" placeholder="YOUR DEGEN NAME (optional)" maxlength="20">
+    <button class="char-start-btn" id="char-start" disabled>ENTER THE GAME</button>
+  </div>
+</div>
+
+<!-- PLAYER BADGE (hidden until character selected) -->
+<div class="player-badge" id="player-badge" style="display:none">
+  <div class="pb-avatar"><img id="pb-avatar-img" src="" alt=""></div>
+  <div class="pb-info">
+    <div class="pb-name" id="pb-name">DEGEN</div>
+    <div class="pb-char" id="pb-char">TRUMP</div>
+    <div class="pb-money" id="pb-money">1,500 USDT</div>
+  </div>
+</div>
+
 <div class="titan-bg">
   <img class="titan trump" src="img/trump.jpg" alt="">
   <img class="titan elon" src="img/elon.jpg" alt="">
@@ -412,6 +505,62 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 </div>
 
 <script>
+// ═══ CHARACTER SELECT ═══
+const CHARS={
+  trump:{name:'TRUMP',aura:'#FFD700',aura2:'#E11D48',tag:'THE DEALMAKER',img:'img/trump.jpg'},
+  elon:{name:'ELON',aura:'#00D4FF',aura2:'#627EEA',tag:'KEKIUS MAXIMUS',img:'img/elon.jpg'},
+  cz:{name:'CZ',aura:'#F3BA2F',aura2:'#FFD040',tag:'THE EXCHANGE KING',img:'img/cz.jpg'},
+  vitalik:{name:'VITALIK',aura:'#9945FF',aura2:'#14F195',tag:'THE ETH WIZARD',img:'img/vitalik.jpg'}
+};
+window.PLAYER={char:null,name:'',money:1500};
+
+document.querySelectorAll('.char-card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    document.querySelectorAll('.char-card').forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');
+    const charKey=card.getAttribute('data-char');
+    window.PLAYER.char=charKey;
+    document.getElementById('char-start').disabled=false;
+    // pulse the start button
+    if(window.gsap){gsap.fromTo('.char-start-btn',{scale:1},{scale:1.08,duration:.2,yoyo:true,repeat:1,ease:'power2.out'})}
+  });
+});
+
+document.getElementById('char-start').addEventListener('click',()=>{
+  if(!window.PLAYER.char)return;
+  const name=document.getElementById('name-input').value.trim();
+  window.PLAYER.name=name||CHARS[window.PLAYER.char].name;
+  const c=CHARS[window.PLAYER.char];
+  // update player badge
+  document.getElementById('pb-avatar-img').src=c.img;
+  document.getElementById('pb-name').textContent=window.PLAYER.name.toUpperCase();
+  document.getElementById('pb-char').textContent=c.name;
+  document.getElementById('pb-money').textContent='1,500 USDT';
+  document.querySelector('.player-badge').style.setProperty('--player-aura',c.aura);
+  // update token
+  const tokenImg=document.getElementById('token-img');
+  if(tokenImg)tokenImg.src=c.img;
+  document.querySelector('.token').style.setProperty('--player-aura',c.aura);
+  // hide overlay with animation
+  const overlay=document.getElementById('char-select');
+  if(window.gsap){
+    gsap.to(overlay,{opacity:0,duration:.6,ease:'power2.in',onComplete:()=>overlay.classList.add('hidden')});
+    gsap.from('.player-badge',{x:-300,duration:.8,ease:'back.out(1.5)',delay:.5,onStart:()=>{document.getElementById('player-badge').style.display='flex'}});
+  }else{
+    overlay.classList.add('hidden');
+    document.getElementById('player-badge').style.display='flex';
+  }
+  // welcome sound
+  setTimeout(()=>{
+    if(window.confetti){
+      confetti({particleCount:120,spread:90,origin:{x:.5,y:.5},colors:[c.aura,c.aura2,'#FFD700','#FFFFFF']});
+    }
+    const dd=document.getElementById('dice-display');
+    if(dd)dd.textContent=`🎩 ${window.PLAYER.name.toUpperCase()} - READY!`;
+  },600);
+});
+
+// ═══ LOGOS ═══
 const L=n=>`https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/${n}/large.png`;
 const XC=n=>`https://assets.coingecko.com/markets/images/${n}`;
 const LOGOS={'DOGE':L('dogecoin'),'PEPE':L('pepe'),'Bitcoin':L('bitcoin'),'Ethereum':L('ethereum'),'TRUMP':L('official-trump'),'TRON':L('tron'),'XRP':L('ripple'),'Solana':L('solana'),'BNB Chain':L('binancecoin'),'Sui':L('sui'),'Arbitrum':L('arbitrum'),'Optimism':L('optimism'),'Base':L('base-protocol'),'Uniswap':L('uniswap'),'Aave':L('aave'),'MakerDAO':L('maker'),'Kraken':XC('29/large/kraken.jpg'),'Bitget':XC('540/large/Bitget.jpeg'),'Coinbase':XC('23/large/Coinbase_Coin_Primary.jpg'),'Bybit':XC('698/large/bybit_spot.png'),'OKX':XC('96/large/WeChat_Image_20220117220452.png'),'Binance':XC('52/large/binance.jpg'),'MetaMask':'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg','Phantom':L('phantom'),'Trust Wallet':L('trust-wallet-token'),'Ledger':L('ledger-stax')};
@@ -547,11 +696,11 @@ function buildTicker(trackId){
     gsap.from('.gc',{duration:.5,y:30,opacity:0,stagger:.04,ease:'back.out(1.5)',delay:.5,scrollTrigger:null});
   }
 
-  // === ADD PLAYER TOKEN ===
+  // === ADD PLAYER TOKEN (will get image after character select) ===
   const token=document.createElement('div');
   token.className='token';
   token.id='player-token';
-  token.textContent='🎩';
+  token.innerHTML='<img id="token-img" src="" alt="">';
   document.getElementById('board').appendChild(token);
   window.playerPos=0;
   placeToken(0);

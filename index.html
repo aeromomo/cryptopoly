@@ -309,6 +309,43 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .rb .hi{color:var(--gold);font-weight:700}
 
 .footer{text-align:center;padding:50px;color:#0a0e16;font-size:11px;letter-spacing:3px;font-family:'Bebas Neue'}
+
+/* ═══════════ ROLL BUTTON - CASINO STYLE ═══════════ */
+.roll-panel{position:fixed;bottom:30px;right:30px;z-index:100;display:flex;flex-direction:column;align-items:center;gap:12px}
+.roll-btn{font-family:'Bebas Neue';font-size:28px;letter-spacing:3px;color:#000;background:linear-gradient(135deg,#FFD700,#FF6B00);border:3px solid #000;border-radius:12px;padding:16px 36px;cursor:pointer;transition:all .15s;box-shadow:6px 6px 0 #000,0 0 30px rgba(255,215,0,.6);text-transform:uppercase}
+.roll-btn:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 #000,0 0 40px rgba(255,215,0,.8)}
+.roll-btn:active{transform:translate(3px,3px);box-shadow:3px 3px 0 #000}
+.roll-btn:disabled{opacity:.5;cursor:not-allowed}
+.dice-display{font-family:'JetBrains Mono';font-weight:700;font-size:14px;color:#FFD700;background:rgba(0,0,0,.9);border:2px solid #FFD700;padding:6px 14px;border-radius:6px;min-width:140px;text-align:center;text-shadow:0 0 8px #FFD700}
+
+/* ═══════════ PLAYER TOKEN ═══════════ */
+.token{position:absolute;width:clamp(20px,3vmin,32px);height:clamp(20px,3vmin,32px);border-radius:50%;background:radial-gradient(circle,#FFD700,#FF6B00);border:2.5px solid #000;box-shadow:0 0 20px #FFD700,0 3px 6px rgba(0,0,0,.8);z-index:20;pointer-events:none;transition:all .18s cubic-bezier(.5,-.3,.6,1.3);display:flex;align-items:center;justify-content:center;font-size:clamp(10px,1.5vmin,16px)}
+.token::before{content:'';position:absolute;inset:-6px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,0,.5),transparent 70%);z-index:-1;animation:token-pulse 1s ease-in-out infinite}
+@keyframes token-pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.4);opacity:1}}
+
+/* ═══════════ CASINO MARQUEE CHASE ═══════════ */
+.c.walk-flash{animation:walk-flash .2s ease-out}
+@keyframes walk-flash{
+  0%{filter:brightness(1)}
+  50%{filter:brightness(2.5) saturate(1.5);box-shadow:inset 0 0 60px #FFD700,0 0 60px #FFD700,0 0 100px #FFD700!important;transform:scale(1.15)}
+  100%{filter:brightness(1)}
+}
+.c.land-flash{animation:land-flash 1.2s ease-out}
+@keyframes land-flash{
+  0%{filter:brightness(1)}
+  15%{filter:brightness(3) saturate(2);box-shadow:inset 0 0 80px #FFD700,0 0 100px #FFD700,0 0 200px #FF6B00!important;transform:scale(1.25) rotate(-2deg)}
+  30%{transform:scale(1.15) rotate(2deg)}
+  60%{filter:brightness(2);transform:scale(1.1) rotate(-1deg)}
+  100%{filter:brightness(1);transform:scale(1)}
+}
+
+/* marquee chase on edge cells */
+.c.chase{animation:chase .3s ease-out}
+@keyframes chase{
+  0%{filter:brightness(1)}
+  50%{filter:brightness(2.2) saturate(1.5);box-shadow:inset 0 0 40px var(--b1,#FFD700),0 0 30px var(--b1,#FFD700)!important}
+  100%{filter:brightness(1)}
+}
 </style>
 </head>
 <body>
@@ -364,6 +401,12 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 </div></div>
 
 <div class="footer">CRYPTOPOLY &copy; 2026 &mdash; BUILT FOR DEGENS</div>
+</div>
+
+<!-- ROLL PANEL -->
+<div class="roll-panel">
+  <div class="dice-display" id="dice-display">🎲 ROLL TO WALK</div>
+  <button class="roll-btn" id="roll-btn" onclick="rollAndWalk()">ROLL</button>
 </div>
 
 <script>
@@ -454,9 +497,10 @@ function buildTicker(trackId){
   const pumpIds=new Set(shuffled.slice(0,3));
   const dumpIds=new Set(shuffled.slice(3,5));
 
+  window.SQ_DATA=SQ;
   SQ.forEach(sq=>{
     const[r,c]=GP[sq.id];const s=r===1?'t':r===11?'b':c===1?'l':c===11?'r':'';
-    const e=document.createElement('div');e.className='c';e.style.gridRow=r;e.style.gridColumn=c;e.setAttribute('data-s',s);
+    const e=document.createElement('div');e.className='c';e.style.gridRow=r;e.style.gridColumn=c;e.setAttribute('data-s',s);e.setAttribute('data-sqid',sq.id);
     const brand=BRAND[sq.n]||[GC[sq.g]||'#888','#555'];
     e.style.setProperty('--b1',brand[0]);e.style.setProperty('--b2',brand[1]);
     if(sq.g)e.setAttribute('data-tier',TIER[sq.g]||'');
@@ -484,7 +528,136 @@ function buildTicker(trackId){
   });
   buildTicker('ticker-track');
   buildTicker('ticker-track-2');
+
+  // === ADD PLAYER TOKEN ===
+  const token=document.createElement('div');
+  token.className='token';
+  token.id='player-token';
+  token.textContent='🎩';
+  document.getElementById('board').appendChild(token);
+  window.playerPos=0;
+  placeToken(0);
+
+  // casino marquee idle chase (slow)
+  startIdleChase();
 })();
+
+function placeToken(pos){
+  const sqEl=document.querySelector(`.c[data-sqid="${pos}"]`);
+  if(!sqEl)return;
+  const token=document.getElementById('player-token');
+  const board=document.getElementById('board');
+  const br=board.getBoundingClientRect();
+  const sr=sqEl.getBoundingClientRect();
+  token.style.left=(sr.left-br.left+sr.width/2-token.offsetWidth/2)+'px';
+  token.style.top=(sr.top-br.top+sr.height/2-token.offsetHeight/2)+'px';
+}
+
+// === AUDIO (biubiubiu) ===
+let audioCtx=null;
+function ac(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx}
+function biu(freq=800,dur=.08){
+  const c=ac(),o=c.createOscillator(),g=c.createGain();
+  o.type='square';
+  o.frequency.setValueAtTime(freq,c.currentTime);
+  o.frequency.exponentialRampToValueAtTime(freq*.6,c.currentTime+dur);
+  g.gain.setValueAtTime(.08,c.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,c.currentTime+dur);
+  o.connect(g).connect(c.destination);
+  o.start();o.stop(c.currentTime+dur);
+}
+function jackpot(){
+  const c=ac(),t=c.currentTime;
+  [600,800,1000,1200,1400,1200,1000,1400].forEach((f,i)=>{
+    const o=c.createOscillator(),g=c.createGain();
+    o.type='triangle';o.frequency.value=f;
+    g.gain.setValueAtTime(.12,t+i*.07);
+    g.gain.exponentialRampToValueAtTime(.001,t+i*.07+.1);
+    o.connect(g).connect(c.destination);
+    o.start(t+i*.07);o.stop(t+i*.07+.1);
+  });
+}
+
+// === ROLL & WALK ===
+let isRolling=false;
+function rollAndWalk(){
+  if(isRolling)return;
+  isRolling=true;
+  const btn=document.getElementById('roll-btn');
+  const dd=document.getElementById('dice-display');
+  btn.disabled=true;
+
+  // dice animation
+  let rolls=0;
+  const rollInterval=setInterval(()=>{
+    const d1=1+Math.floor(Math.random()*6),d2=1+Math.floor(Math.random()*6);
+    dd.textContent=`🎲 ${d1} + ${d2}`;
+    biu(400+Math.random()*400,.04);
+    rolls++;
+    if(rolls>=8){
+      clearInterval(rollInterval);
+      const d1=1+Math.floor(Math.random()*6),d2=1+Math.floor(Math.random()*6);
+      const steps=d1+d2;
+      dd.textContent=`🎲 ${d1} + ${d2} = ${steps}`;
+      setTimeout(()=>walkSteps(steps),400);
+    }
+  },80);
+}
+
+async function walkSteps(n){
+  const dd=document.getElementById('dice-display');
+  for(let i=0;i<n;i++){
+    window.playerPos=(window.playerPos+1)%40;
+    const pos=window.playerPos;
+    const sqEl=document.querySelector(`.c[data-sqid="${pos}"]`);
+    if(sqEl){
+      sqEl.classList.add('walk-flash');
+      setTimeout(()=>sqEl.classList.remove('walk-flash'),200);
+    }
+    placeToken(pos);
+    biu(600+(i*30),.06);
+    dd.textContent=`🚶 STEP ${i+1}/${n}`;
+    await new Promise(r=>setTimeout(r,220));
+  }
+  // LANDED
+  const landedSq=document.querySelector(`.c[data-sqid="${window.playerPos}"]`);
+  if(landedSq){
+    landedSq.classList.add('land-flash');
+    setTimeout(()=>landedSq.classList.remove('land-flash'),1200);
+  }
+  jackpot();
+  const sq=(window.SQ_DATA||[])[window.playerPos];
+  if(sq)dd.textContent=`📍 ${sq.n||'?'}`;
+  setTimeout(()=>{document.getElementById('roll-btn').disabled=false;isRolling=false},1400);
+}
+
+// === IDLE CASINO MARQUEE CHASE ===
+function startIdleChase(){
+  const edgeOrder=[];
+  // bottom row right-to-left (0..10)
+  for(let i=0;i<=10;i++)edgeOrder.push(i);
+  // left column bottom-to-top (11..19)
+  for(let i=11;i<=19;i++)edgeOrder.push(i);
+  // top row left-to-right (20..30)
+  for(let i=20;i<=30;i++)edgeOrder.push(i);
+  // right column top-to-bottom (31..39)
+  for(let i=31;i<=39;i++)edgeOrder.push(i);
+
+  let idx=0;
+  setInterval(()=>{
+    if(isRolling)return;
+    const pos=edgeOrder[idx%40];
+    const sqEl=document.querySelector(`.c[data-sqid="${pos}"]`);
+    if(sqEl){
+      sqEl.classList.add('chase');
+      setTimeout(()=>sqEl.classList.remove('chase'),300);
+    }
+    idx++;
+  },120);
+}
+
+// replace token on resize
+window.addEventListener('resize',()=>{if(window.playerPos!==undefined)placeToken(window.playerPos)});
 </script>
 </body>
 </html>

@@ -4,183 +4,311 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRYPTOPOLY</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&family=Bebas+Neue&family=Press+Start+2P&family=Bungee&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#030508;--gold:#f7931a}
+:root{--bg:#030508;--gold:#f7931a;--p5-red:#E11D48;--p5-ink:#0a0a0a}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:#d0d8e8;font-family:'Inter',sans-serif;overflow-x:hidden}
+body{background:var(--bg);color:#d0d8e8;font-family:'Inter',sans-serif;overflow-x:hidden;position:relative}
 
-/* ══ TITAN BACKGROUND ══ */
+/* ═══════════ BACKGROUND GRID (subtle blueprint) ═══════════ */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(247,147,26,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(247,147,26,.03) 1px,transparent 1px);
+  background-size:60px 60px}
+
+/* ═══════════ TITAN BACKGROUND ═══════════ */
 .titan-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
-.titan-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 20%,rgba(3,5,8,.7) 70%,rgba(3,5,8,.95) 100%);z-index:1;pointer-events:none}
-.titan-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(80,0,0,.08),rgba(3,5,8,.5) 60%,rgba(3,5,8,.75));z-index:2;pointer-events:none;mix-blend-mode:multiply}
-.titan{position:absolute;filter:grayscale(85%) brightness(.55) contrast(1.8) sepia(20%);opacity:.85}
-.titan.trump{width:38vw;top:-8%;left:-5%;transform:rotate(-3deg);filter:grayscale(75%) brightness(.5) contrast(2) sepia(25%) hue-rotate(-10deg)}
-.titan.elon{width:34vw;top:2%;right:-4%;transform:rotate(4deg) scaleX(-1);filter:grayscale(80%) brightness(.55) contrast(1.9) sepia(15%)}
-.titan.cz{width:28vw;bottom:5%;left:4%;transform:rotate(2deg);filter:grayscale(80%) brightness(.6) contrast(1.9) sepia(20%)}
-.titan.vitalik{width:30vw;bottom:0%;right:3%;transform:rotate(-5deg);filter:grayscale(85%) brightness(.55) contrast(2) sepia(15%)}
-.titan.satoshi{width:26vw;top:28%;left:37%;opacity:.5;filter:grayscale(100%) brightness(.35) contrast(2.5) hue-rotate(180deg)}
-.content{position:relative;z-index:2}
+.titan-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 25%,rgba(3,5,8,.6) 65%,rgba(3,5,8,.95) 100%);z-index:2}
+.titan{position:absolute;filter:grayscale(70%) brightness(.7) contrast(1.9) sepia(15%);opacity:.8}
+.titan.trump{width:38vw;top:-8%;left:-5%;transform:rotate(-3deg)}
+.titan.elon{width:34vw;top:2%;right:-4%;transform:rotate(4deg) scaleX(-1)}
+.titan.cz{width:28vw;bottom:5%;left:4%;transform:rotate(2deg)}
+.titan.vitalik{width:30vw;bottom:0%;right:3%;transform:rotate(-5deg)}
+.titan.satoshi{width:26vw;top:28%;left:37%;opacity:.4;filter:grayscale(100%) brightness(.4) contrast(2.5)}
+.content{position:relative;z-index:3}
 
-.hero{text-align:center;padding:60px 20px 20px}
-.hero h1{font-family:'Orbitron';font-size:clamp(44px,9vw,90px);font-weight:900;letter-spacing:clamp(6px,2vw,18px);background:linear-gradient(135deg,#f7931a,#e8b74a 25%,#627eea 50%,#14F195 75%,#f7931a);background-size:400% 400%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gd 6s ease infinite;filter:drop-shadow(0 0 40px rgba(247,147,26,.2))}
-@keyframes gd{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-.hero .sub{font-family:'Orbitron';font-size:13px;color:#1e2e4a;letter-spacing:8px;margin-top:10px}
+/* ═══════════ PERSONA 5 HERO ═══════════ */
+.hero{position:relative;padding:80px 20px 40px;text-align:center;overflow:hidden}
+/* P5 red slashes */
+.hero::before,.hero::after{content:'';position:absolute;background:var(--p5-red);pointer-events:none}
+.hero::before{top:25%;left:-10%;right:-10%;height:60px;transform:rotate(-2.5deg);clip-path:polygon(0 40%,100% 0,100% 60%,0 100%);opacity:.9}
+.hero::after{bottom:15%;left:-10%;right:-10%;height:40px;transform:rotate(2deg);clip-path:polygon(0 30%,100% 60%,95% 100%,5% 70%);opacity:.7}
+.hero h1{position:relative;z-index:2;font-family:'Bebas Neue','Orbitron',sans-serif;font-size:clamp(56px,12vw,140px);font-weight:900;letter-spacing:clamp(4px,1.5vw,12px);color:#fff;text-shadow:
+  6px 6px 0 var(--p5-red),
+  12px 12px 0 var(--p5-ink),
+  0 0 60px rgba(225,29,72,.4);
+  transform:rotate(-1.5deg);line-height:.9}
+.hero .sub{position:relative;z-index:2;display:inline-block;margin-top:20px;padding:8px 24px;background:#fff;color:#000;font-family:'Bebas Neue';font-size:clamp(14px,2vw,22px);letter-spacing:6px;transform:rotate(1deg) skew(-5deg);box-shadow:6px 6px 0 var(--p5-red),10px 10px 0 #000}
 
-/* ══ BOARD ══ */
-.board-wrap{display:flex;justify-content:center;padding:10px 20px 20px}
-.board{display:grid;grid-template-columns:1.6fr repeat(9,1fr) 1.6fr;grid-template-rows:1.6fr repeat(9,1fr) 1.6fr;width:min(95vmin,1100px);aspect-ratio:1;border:2px solid rgba(247,147,26,.2);border-radius:8px;background:rgba(6,10,18,.72);box-shadow:0 0 120px rgba(247,147,26,.08),0 0 40px rgba(0,0,0,.6);overflow:hidden;backdrop-filter:blur(8px)}
+/* ═══════════ JOJO TITAN AURALS (around center) ═══════════ */
+@keyframes aura-spin{to{transform:rotate(360deg)}}
+@keyframes aura-pulse{0%,100%{opacity:.9;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+@keyframes menace{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-/* ── branded cell ── */
-.c{border:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3px;position:relative;overflow:hidden;transition:transform .25s cubic-bezier(.25,.8,.25,1),box-shadow .25s}
+/* ═══════════ BOARD ═══════════ */
+.board-wrap{display:flex;justify-content:center;padding:20px 20px 40px;position:relative}
+.board{display:grid;grid-template-columns:1.6fr repeat(9,1fr) 1.6fr;grid-template-rows:1.6fr repeat(9,1fr) 1.6fr;width:min(95vmin,1100px);aspect-ratio:1;border:3px solid rgba(247,147,26,.25);border-radius:4px;background:rgba(6,10,18,.72);
+  box-shadow:
+    0 0 140px rgba(247,147,26,.1),
+    0 0 40px rgba(0,0,0,.7),
+    inset 0 0 60px rgba(0,0,0,.5);
+  overflow:hidden;backdrop-filter:blur(8px);
+  position:relative}
+/* comic book panel frame */
+.board::before{content:'';position:absolute;inset:4px;border:1px solid rgba(255,255,255,.08);pointer-events:none;z-index:10}
+
+/* ═══════════ CELLS - BASE ═══════════ */
+.c{border:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3px;position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.25,.8,.25,1),box-shadow .3s,filter .3s}
+
+/* ═══════════ MARVEL SNAP — KIRBY DOTS ═══════════ */
 .c.prop,.c.wcell,.c.ucell{
   background:
-    radial-gradient(ellipse 120% 90% at 50% 30%, var(--b1,#888)3d 0%, var(--b1,#888)0f 50%, rgba(8,12,20,.94) 100%),
-    linear-gradient(135deg, var(--b2,#555)1a 0%, rgba(5,8,14,.88) 100%);
-  border:1px solid color-mix(in srgb, var(--b1,#888) 40%, transparent);
+    /* top highlight */
+    linear-gradient(180deg, color-mix(in srgb, var(--b1,#888) 8%, transparent) 0%, transparent 30%),
+    /* Kirby dots - explosive comic dots */
+    radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--b1,#888) 50%, transparent) 1.2px, transparent 2px),
+    radial-gradient(circle at 78% 28%, color-mix(in srgb, var(--b1,#888) 40%, transparent) 1px, transparent 1.8px),
+    radial-gradient(circle at 35% 75%, color-mix(in srgb, var(--b1,#888) 45%, transparent) 1.4px, transparent 2.2px),
+    radial-gradient(circle at 72% 82%, color-mix(in srgb, var(--b1,#888) 35%, transparent) 1px, transparent 1.8px),
+    radial-gradient(circle at 55% 15%, color-mix(in srgb, var(--b1,#888) 30%, transparent) .8px, transparent 1.4px),
+    /* hero radial glow */
+    radial-gradient(ellipse 100% 80% at 50% 30%, color-mix(in srgb, var(--b1,#888) 28%, transparent) 0%, color-mix(in srgb, var(--b1,#888) 8%, transparent) 50%, rgba(8,12,20,.95) 100%),
+    /* base dark */
+    linear-gradient(135deg, color-mix(in srgb, var(--b2,#555) 15%, transparent) 0%, rgba(5,8,14,.9) 100%);
+  border:1.5px solid color-mix(in srgb, var(--b1,#888) 45%, transparent);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.08),
-    inset 0 -8px 12px rgba(0,0,0,.3),
-    inset 0 0 32px color-mix(in srgb, var(--b1,#888) 14%, transparent),
-    0 0 14px color-mix(in srgb, var(--b1,#888) 22%, transparent);
+    inset 0 1px 0 rgba(255,255,255,.1),
+    inset 0 -10px 16px rgba(0,0,0,.4),
+    inset 0 0 36px color-mix(in srgb, var(--b1,#888) 14%, transparent),
+    0 0 16px color-mix(in srgb, var(--b1,#888) 25%, transparent);
 }
-/* holographic shimmer */
+/* comic book panel corner */
 .c.prop::before,.c.wcell::before,.c.ucell::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg, transparent 25%, rgba(255,255,255,.08) 48%, rgba(255,255,255,.02) 52%, transparent 75%);
-  pointer-events:none;z-index:1;opacity:.7;
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:
+    linear-gradient(135deg, transparent 30%, rgba(255,255,255,.1) 48%, rgba(255,255,255,.02) 52%, transparent 70%),
+    /* corner notch */
+    linear-gradient(225deg, transparent 88%, color-mix(in srgb, var(--b1,#fff) 30%, transparent) 88%, color-mix(in srgb, var(--b1,#fff) 30%, transparent) 92%, transparent 92%);
 }
-/* noise texture - kills flat CSS look */
+/* halftone noise */
 .c.prop::after,.c.wcell::after,.c.ucell::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.04;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><filter id='n'><feTurbulence baseFrequency='.9' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  mix-blend-mode:overlay;
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.08;
+  background-image:radial-gradient(rgba(255,255,255,.8) .5px,transparent 1px);
+  background-size:4px 4px;mix-blend-mode:overlay;
 }
-.c:hover{transform:scale(1.06) translateY(-2px);z-index:10;box-shadow:
-  inset 0 1px 0 rgba(255,255,255,.12),
-  inset 0 0 36px color-mix(in srgb, var(--b1,#888) 22%, transparent),
-  0 4px 30px color-mix(in srgb, var(--b1,#888) 45%, transparent)}
-.c:hover .lg img{transform:scale(1.08);transition:transform .3s}
 
-/* LEGENDARY TIER - Bitcoin & Ethereum get extra sauce */
-.c[data-tier="legend"]{
-  border:2px solid color-mix(in srgb, var(--b1,#888) 60%, transparent)!important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.15),
-    inset 0 0 48px color-mix(in srgb, var(--b1,#888) 22%, transparent),
-    0 0 24px color-mix(in srgb, var(--b1,#888) 40%, transparent),
-    0 0 60px color-mix(in srgb, var(--b1,#888) 20%, transparent)!important;
-}
-.c[data-tier="legend"] .lg{
-  width:clamp(42px,7.2vmin,82px)!important;height:clamp(42px,7.2vmin,82px)!important;
-}
-.c[data-tier="legend"] .lg img{
-  filter:drop-shadow(0 0 16px var(--b1,#fff)) drop-shadow(0 0 6px var(--b1,#fff)) drop-shadow(0 3px 6px rgba(0,0,0,.6))!important;
-  animation:pulse 3s ease-in-out infinite;
-}
-@keyframes pulse{0%,100%{filter:drop-shadow(0 0 14px var(--b1,#fff)) drop-shadow(0 3px 6px rgba(0,0,0,.6))}50%{filter:drop-shadow(0 0 22px var(--b1,#fff)) drop-shadow(0 0 8px var(--b1,#fff)) drop-shadow(0 3px 6px rgba(0,0,0,.6))}}
+/* ═══════════ HOVER - EXPLOSIVE ═══════════ */
+.c:hover{transform:scale(1.08) translateY(-3px) rotate(-.5deg);z-index:10;filter:brightness(1.15);box-shadow:
+  inset 0 1px 0 rgba(255,255,255,.15),
+  inset 0 0 40px color-mix(in srgb, var(--b1,#888) 28%, transparent),
+  0 6px 36px color-mix(in srgb, var(--b1,#888) 50%, transparent),
+  0 0 80px color-mix(in srgb, var(--b1,#888) 20%, transparent)}
+.c:hover .lg img{transform:scale(1.12) rotate(3deg)}
+.c:hover .lg{animation:menace .6s ease-in-out}
 
-.c .lg{width:clamp(36px,6.2vmin,72px);height:clamp(36px,6.2vmin,72px);border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:3;background:radial-gradient(circle, rgba(255,255,255,.08) 0%, transparent 70%);padding:2px}
-.c .lg img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px color-mix(in srgb, var(--b1,#fff) 55%, transparent)) drop-shadow(0 2px 4px rgba(0,0,0,.5))}
-.c .lg .fb{font-size:clamp(18px,3vmin,32px);line-height:1;filter:drop-shadow(0 0 8px var(--b1,#fff))}
-.c .nm{font-family:'Orbitron';font-weight:800;font-size:clamp(5.5px,.85vmin,10.5px);color:#fff;line-height:1.1;letter-spacing:.5px;z-index:3;text-shadow:0 1px 3px rgba(0,0,0,.9),0 0 10px color-mix(in srgb, var(--b1,#fff) 30%, transparent);margin-top:2px}
-.c .pr{font-family:'JetBrains Mono';font-size:clamp(5px,.65vmin,8px);color:rgba(255,255,255,.45);z-index:3;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+/* ═══════════ LOGO ═══════════ */
+.c .lg{width:clamp(38px,6.5vmin,74px);height:clamp(38px,6.5vmin,74px);border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:3;padding:3px;position:relative;transition:transform .3s}
+.c .lg::before{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,.15) 0%, transparent 60%)}
+.c .lg img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 12px var(--b1,#fff)) drop-shadow(0 2px 4px rgba(0,0,0,.6));transition:transform .3s;position:relative;z-index:2}
+.c .lg .fb{font-size:clamp(18px,3vmin,34px);line-height:1;filter:drop-shadow(0 0 8px var(--b1,#fff));z-index:2}
 
+/* ═══════════ TEXT ═══════════ */
+.c .nm{font-family:'Bebas Neue','Orbitron';font-weight:700;font-size:clamp(7px,1.05vmin,13px);color:#fff;line-height:1.1;letter-spacing:1.2px;z-index:3;text-shadow:0 1px 3px rgba(0,0,0,1),0 0 12px color-mix(in srgb, var(--b1,#fff) 50%, transparent);margin-top:3px}
+.c .pr{font-family:'JetBrains Mono';font-size:clamp(5.5px,.7vmin,9px);color:rgba(255,255,255,.55);z-index:3;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.9)}
+
+/* ═══════════ COLOR BAR - NEON ═══════════ */
 .c .bar{position:absolute;z-index:2}
-.c[data-s="t"] .bar{bottom:0;left:0;right:0;height:5px;box-shadow:0 0 16px 3px var(--b1,#888)}
-.c[data-s="b"] .bar{top:0;left:0;right:0;height:5px;box-shadow:0 0 16px 3px var(--b1,#888)}
-.c[data-s="l"] .bar{top:0;bottom:0;right:0;width:5px;box-shadow:0 0 16px 3px var(--b1,#888)}
-.c[data-s="r"] .bar{top:0;bottom:0;left:0;width:5px;box-shadow:0 0 16px 3px var(--b1,#888)}
+.c[data-s="t"] .bar{bottom:0;left:0;right:0;height:5px;box-shadow:0 0 18px 3px var(--b1,#888),0 0 6px 1px var(--b1,#888)}
+.c[data-s="b"] .bar{top:0;left:0;right:0;height:5px;box-shadow:0 0 18px 3px var(--b1,#888),0 0 6px 1px var(--b1,#888)}
+.c[data-s="l"] .bar{top:0;bottom:0;right:0;width:5px;box-shadow:0 0 18px 3px var(--b1,#888),0 0 6px 1px var(--b1,#888)}
+.c[data-s="r"] .bar{top:0;bottom:0;left:0;width:5px;box-shadow:0 0 18px 3px var(--b1,#888),0 0 6px 1px var(--b1,#888)}
 
-/* corners get brand treatment too */
+/* ═══════════ TIER-SPECIFIC STYLES ═══════════ */
+/* MEME TIER (Brown) - Comic/Chaotic */
+.c[data-tier="meme"]{animation:meme-jitter 4s ease-in-out infinite}
+.c[data-tier="meme"] .nm{font-family:'Bungee','Impact',sans-serif;letter-spacing:.3px}
+@keyframes meme-jitter{0%,90%,100%{transform:rotate(0)}93%{transform:rotate(-.5deg)}96%{transform:rotate(.8deg)}}
+
+/* L2 TIER (LightBlue) - Blueprint */
+.c[data-tier="l2"]::before{background-image:repeating-linear-gradient(45deg, transparent 0, transparent 8px, color-mix(in srgb, var(--b1,#29B6F6) 15%, transparent) 8px, color-mix(in srgb, var(--b1,#29B6F6) 15%, transparent) 9px)!important}
+
+/* DEFI TIER (Pink) - Vault */
+.c[data-tier="defi"]{border-image:linear-gradient(135deg,var(--b1),#FFD700,var(--b1)) 1}
+
+/* VIRAL TIER (Orange) - Billboard marquee */
+.c[data-tier="viral"] .nm{animation:neon-flicker 2s ease-in-out infinite}
+@keyframes neon-flicker{0%,100%,92%{opacity:1}93%,95%{opacity:.4}94%{opacity:.8}}
+
+/* CEX TIER (Red) - Terminal */
+.c[data-tier="cex"] .pr{color:#0f0;font-family:'JetBrains Mono';text-shadow:0 0 6px #0f0}
+
+/* TOP CEX (Yellow) - Casino neon */
+.c[data-tier="topcex"]{animation:casino 3s ease-in-out infinite}
+@keyframes casino{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.1),inset 0 0 36px color-mix(in srgb, var(--b1) 14%, transparent),0 0 16px color-mix(in srgb, var(--b1) 35%, transparent)}50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 0 40px color-mix(in srgb, var(--b1) 25%, transparent),0 0 28px color-mix(in srgb, var(--b1) 60%, transparent)}}
+
+/* PREMIUM L1 (Green) - Cyberpunk circuit */
+.c[data-tier="premium"]::after{background-image:repeating-linear-gradient(90deg,transparent 0,transparent 6px,color-mix(in srgb,var(--b1) 20%,transparent) 6px,color-mix(in srgb,var(--b1) 20%,transparent) 7px),repeating-linear-gradient(0deg,transparent 0,transparent 6px,color-mix(in srgb,var(--b1) 20%,transparent) 6px,color-mix(in srgb,var(--b1) 20%,transparent) 7px)!important;opacity:.1!important;background-size:auto!important}
+
+/* LEGENDARY TIER (BTC/ETH) - Monument */
+.c[data-tier="legend"]{border:2px solid color-mix(in srgb, var(--b1) 70%, transparent)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    inset 0 0 60px color-mix(in srgb, var(--b1) 28%, transparent),
+    0 0 30px color-mix(in srgb, var(--b1) 50%, transparent),
+    0 0 80px color-mix(in srgb, var(--b1) 25%, transparent)!important;
+  animation:legend-pulse 3s ease-in-out infinite}
+.c[data-tier="legend"] .lg{width:clamp(46px,8vmin,90px)!important;height:clamp(46px,8vmin,90px)!important}
+.c[data-tier="legend"] .lg img{filter:drop-shadow(0 0 20px var(--b1)) drop-shadow(0 0 8px var(--b1)) drop-shadow(0 3px 6px rgba(0,0,0,.7))!important;animation:legend-glow 3s ease-in-out infinite}
+@keyframes legend-pulse{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 0 60px color-mix(in srgb, var(--b1) 28%, transparent),0 0 30px color-mix(in srgb, var(--b1) 50%, transparent),0 0 80px color-mix(in srgb, var(--b1) 25%, transparent)}50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 0 70px color-mix(in srgb, var(--b1) 38%, transparent),0 0 40px color-mix(in srgb, var(--b1) 70%, transparent),0 0 120px color-mix(in srgb, var(--b1) 35%, transparent)}}
+@keyframes legend-glow{0%,100%{filter:drop-shadow(0 0 18px var(--b1)) drop-shadow(0 3px 6px rgba(0,0,0,.7))}50%{filter:drop-shadow(0 0 28px var(--b1)) drop-shadow(0 0 12px var(--b1)) drop-shadow(0 3px 6px rgba(0,0,0,.7))}}
+
+/* ═══════════ PUMP / DUMP ═══════════ */
+.c[data-mode="pump"]{animation:pump-surge 2s ease-in-out infinite}
+.c[data-mode="pump"]::before{background:linear-gradient(0deg, rgba(0,255,100,.25), transparent 60%)!important}
+@keyframes pump-surge{0%,100%{box-shadow:inset 0 -30px 20px -10px rgba(0,255,100,.3),inset 0 0 36px color-mix(in srgb, var(--b1) 14%, transparent),0 0 20px rgba(0,255,100,.5)}50%{box-shadow:inset 0 -50px 30px -10px rgba(0,255,100,.5),inset 0 0 40px color-mix(in srgb, var(--b1) 25%, transparent),0 0 40px rgba(0,255,100,.8)}}
+.c[data-mode="pump"]::after{content:'🚀'!important;position:absolute;top:2px;right:3px;font-size:clamp(10px,1.5vmin,18px);animation:rocket 1.5s ease-in infinite;z-index:5;background:none!important;opacity:1!important}
+@keyframes rocket{0%{transform:translate(0,0)}100%{transform:translate(-2px,-10px);opacity:0}}
+
+.c[data-mode="dump"]{animation:dump-crash 2s ease-in-out infinite}
+.c[data-mode="dump"]::before{background:linear-gradient(180deg, rgba(255,0,60,.25), transparent 60%)!important}
+@keyframes dump-crash{0%,100%{box-shadow:inset 0 30px 20px -10px rgba(255,0,60,.3),inset 0 0 36px color-mix(in srgb, var(--b1) 14%, transparent),0 0 20px rgba(255,0,60,.5)}50%{box-shadow:inset 0 50px 30px -10px rgba(255,0,60,.5),inset 0 0 40px color-mix(in srgb, var(--b1) 25%, transparent),0 0 40px rgba(255,0,60,.8)}}
+.c[data-mode="dump"] .nm::after{content:' 💀';font-size:.85em}
+
+/* ═══════════ CORNERS — JOJO AURAS ═══════════ */
 .c.corner{
   background:
-    radial-gradient(ellipse at center, var(--b1,#263238)33 0%, rgba(8,12,20,.95) 70%),
-    linear-gradient(135deg, var(--b2,#37474f)1a 0%, rgba(3,5,8,.95) 100%);
-  border:2px solid color-mix(in srgb, var(--b1,#263238) 40%, transparent);
+    radial-gradient(circle at center, color-mix(in srgb, var(--b1,#263238) 35%, transparent) 0%, rgba(8,12,20,.95) 75%),
+    conic-gradient(from 0deg at center, var(--b1), transparent 25%, var(--b2), transparent 50%, var(--b1), transparent 75%, var(--b2), var(--b1));
+  background-blend-mode:normal,overlay;
+  border:2px solid color-mix(in srgb, var(--b1,#263238) 55%, transparent);
   box-shadow:
-    inset 0 0 30px color-mix(in srgb, var(--b1,#263238) 15%, transparent),
-    0 0 18px color-mix(in srgb, var(--b1,#263238) 25%, transparent);
-}
-.c.corner .nm{font-family:'Orbitron';font-size:clamp(6px,.95vmin,12px);letter-spacing:1px;color:var(--b1,#fff);text-shadow:0 0 10px color-mix(in srgb, var(--b1,#fff) 60%, transparent),0 2px 3px rgba(0,0,0,.9);font-weight:900;z-index:3}
-.c.corner .sub{font-size:clamp(4px,.52vmin,7px);color:rgba(255,255,255,.4);line-height:1.2;z-index:3}
-.c.corner .ic{font-size:clamp(22px,3.8vmin,44px);filter:drop-shadow(0 0 12px var(--b1,#fff)) drop-shadow(0 2px 4px rgba(0,0,0,.5));z-index:3}
+    inset 0 0 40px color-mix(in srgb, var(--b1,#263238) 22%, transparent),
+    0 0 24px color-mix(in srgb, var(--b1,#263238) 40%, transparent)}
+.c.corner::before{content:'';position:absolute;inset:-20%;background:conic-gradient(from 0deg, transparent, var(--b1)33, transparent 30%, var(--b1)22, transparent 60%, var(--b1)33, transparent);animation:aura-spin 8s linear infinite;z-index:0;opacity:.4}
+.c.corner .nm{font-family:'Bebas Neue';font-size:clamp(8px,1.3vmin,16px);letter-spacing:1.5px;color:#fff;text-shadow:0 0 12px var(--b1),0 2px 4px rgba(0,0,0,1);font-weight:900;z-index:3;transform:rotate(-2deg)}
+.c.corner .sub{font-size:clamp(4px,.55vmin,8px);color:var(--b1);letter-spacing:1.5px;line-height:1.2;z-index:3;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.9)}
+.c.corner .ic{font-size:clamp(26px,4.5vmin,56px);filter:drop-shadow(0 0 16px var(--b1)) drop-shadow(0 2px 4px rgba(0,0,0,.7));z-index:3;animation:menace 3s ease-in-out infinite}
 
-/* card cells - holographic */
+/* ═══════════ CARD CELLS - HOLOGRAPHIC ═══════════ */
 .c.cwp{
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(56,132,244,.28) 0%, rgba(56,132,244,.04) 60%, rgba(6,10,18,.95) 100%),
-    linear-gradient(135deg, rgba(98,126,234,.08) 0%, rgba(5,8,14,.95) 100%);
-  border:1px solid rgba(56,132,244,.4);
-  box-shadow:inset 0 0 30px rgba(56,132,244,.12),0 0 15px rgba(56,132,244,.2);
+    conic-gradient(from 45deg at 50% 30%, rgba(56,132,244,.3), rgba(100,180,255,.15), rgba(56,132,244,.3), rgba(20,60,120,.1), rgba(56,132,244,.3)),
+    radial-gradient(ellipse at 50% 30%, rgba(56,132,244,.3) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(98,126,234,.1) 0%, rgba(5,8,14,.95) 100%);
+  border:1.5px solid rgba(56,132,244,.5);
+  box-shadow:inset 0 0 36px rgba(56,132,244,.18),0 0 18px rgba(56,132,244,.3);
 }
 .c.cal{
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(239,83,80,.28) 0%, rgba(239,83,80,.04) 60%, rgba(6,10,18,.95) 100%),
-    linear-gradient(135deg, rgba(239,83,80,.08) 0%, rgba(5,8,14,.95) 100%);
-  border:1px solid rgba(239,83,80,.4);
-  box-shadow:inset 0 0 30px rgba(239,83,80,.12),0 0 15px rgba(239,83,80,.2);
+    conic-gradient(from 45deg at 50% 30%, rgba(239,83,80,.3), rgba(255,150,150,.15), rgba(239,83,80,.3), rgba(120,20,20,.1), rgba(239,83,80,.3)),
+    radial-gradient(ellipse at 50% 30%, rgba(239,83,80,.3) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(239,83,80,.1) 0%, rgba(5,8,14,.95) 100%);
+  border:1.5px solid rgba(239,83,80,.5);
+  box-shadow:inset 0 0 36px rgba(239,83,80,.18),0 0 18px rgba(239,83,80,.3);
 }
 .c.ctx{
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(255,152,0,.28) 0%, rgba(255,152,0,.04) 60%, rgba(6,10,18,.95) 100%),
-    linear-gradient(135deg, rgba(255,111,0,.08) 0%, rgba(5,8,14,.95) 100%);
-  border:1px solid rgba(255,152,0,.4);
-  box-shadow:inset 0 0 30px rgba(255,152,0,.12),0 0 15px rgba(255,152,0,.2);
+    radial-gradient(ellipse at 50% 30%, rgba(255,152,0,.3) 0%, transparent 60%),
+    linear-gradient(135deg, rgba(255,111,0,.1) 0%, rgba(5,8,14,.95) 100%);
+  border:1.5px solid rgba(255,152,0,.5);
+  box-shadow:inset 0 0 36px rgba(255,152,0,.18),0 0 18px rgba(255,152,0,.3);
 }
 
-.center{grid-column:2/11;grid-row:2/11;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(10,16,26,.9),rgba(3,5,8,.96));border:1px solid rgba(255,255,255,.02);position:relative;overflow:hidden}
-.center::before{content:'';position:absolute;width:150%;height:150%;background:conic-gradient(from 0deg,transparent,rgba(247,147,26,.025),transparent,rgba(98,126,234,.025),transparent);animation:cs 40s linear infinite}
-@keyframes cs{to{transform:rotate(360deg)}}
-.ct-faces{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.18;filter:grayscale(85%) contrast(2.2) brightness(.55) sepia(20%)}
-.ct-faces img{height:90%;object-fit:cover;flex:1;min-width:0}
-.center .ct{font-family:'Orbitron';font-size:clamp(20px,4.5vmin,52px);font-weight:900;letter-spacing:clamp(3px,.8vmin,10px);background:linear-gradient(135deg,#f7931a,#627eea,#14F195);-webkit-background-clip:text;-webkit-text-fill-color:transparent;z-index:1;filter:drop-shadow(0 0 25px rgba(247,147,26,.12))}
-.center .csb{font-family:'Orbitron';font-size:clamp(5px,.65vmin,8px);color:#1a2a44;letter-spacing:4px;z-index:1;margin-top:6px}
-.decks{display:flex;gap:clamp(14px,2.5vmin,32px);margin-top:clamp(10px,2vmin,24px);z-index:1}
-.dk{width:clamp(48px,7.5vmin,95px);height:clamp(66px,10.5vmin,130px);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-weight:700;font-size:clamp(6px,.82vmin,10px)}
-.dk.wp{border:2px solid rgba(56,132,244,.3);color:#3884f4;background:rgba(56,132,244,.04)}
-.dk.al{border:2px solid rgba(239,83,80,.3);color:#ef5350;background:rgba(239,83,80,.04)}
-.dk .di{font-size:clamp(16px,2.5vmin,30px)}
-.dk .dl{font-size:clamp(4px,.5vmin,6px);opacity:.25}
+/* ═══════════ CENTER - JOJO TITANS WITH AURAS ═══════════ */
+.center{grid-column:2/11;grid-row:2/11;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(10,16,26,.92),rgba(3,5,8,.98));border:1px solid rgba(255,255,255,.03);position:relative;overflow:hidden}
+.center::before{content:'';position:absolute;width:150%;height:150%;background:conic-gradient(from 0deg,transparent,rgba(247,147,26,.04),transparent,rgba(98,126,234,.04),transparent,rgba(20,241,149,.04),transparent);animation:aura-spin 60s linear infinite}
 
-.section{max-width:1100px;margin:60px auto;padding:0 20px}
-.sh{font-family:'Orbitron';font-size:clamp(18px,3vw,28px);font-weight:700;text-align:center;letter-spacing:5px}
-.ss{text-align:center;color:#1a2a3a;font-size:11px;margin:6px 0 18px;letter-spacing:1px}
-.sd{width:50px;height:2px;background:linear-gradient(90deg,var(--gold),#627eea);margin:0 auto 22px}
+/* Five JoJo titan portraits with colored auras */
+.jojo-ring{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.jojo{position:absolute;width:clamp(70px,14vmin,180px);height:clamp(70px,14vmin,180px);border-radius:50%;overflow:hidden;border:3px solid var(--aura);box-shadow:0 0 40px var(--aura),inset 0 0 30px rgba(0,0,0,.3);z-index:2}
+.jojo img{width:100%;height:100%;object-fit:cover;filter:grayscale(30%) contrast(1.2) brightness(.95)}
+.jojo::before{content:'';position:absolute;inset:-30%;border-radius:50%;background:conic-gradient(from 0deg, var(--aura) 0deg, transparent 60deg, var(--aura) 120deg, transparent 180deg, var(--aura) 240deg, transparent 300deg, var(--aura));filter:blur(8px);animation:aura-spin 6s linear infinite;z-index:-1;opacity:.7}
+.jojo::after{content:'';position:absolute;inset:-60%;border-radius:50%;background:radial-gradient(circle, var(--aura) 0%, transparent 40%);opacity:.3;z-index:-2}
 
-.cg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.jojo.trump{--aura:#FFD700;top:8%;left:12%}
+.jojo.trump{box-shadow:0 0 40px #E11D48, 0 0 60px #FFD700, inset 0 0 30px rgba(0,0,0,.3)}
+.jojo.elon{--aura:#00D4FF;top:8%;right:12%}
+.jojo.cz{--aura:#F3BA2F;bottom:12%;left:12%}
+.jojo.vitalik{--aura:#9945FF;bottom:12%;right:12%}
+.jojo.satoshi{--aura:#f7931a;top:50%;left:50%;transform:translate(-50%,-50%);width:clamp(60px,11vmin,140px);height:clamp(60px,11vmin,140px);opacity:.85;filter:grayscale(100%)}
+.jojo.satoshi img{filter:grayscale(100%) brightness(.5) contrast(2)}
+
+.jojo-label{position:absolute;background:rgba(0,0,0,.85);color:var(--aura);padding:3px 10px;font-family:'Bebas Neue';font-size:clamp(8px,1vmin,12px);letter-spacing:2px;border:1px solid var(--aura);white-space:nowrap;z-index:3;top:105%;left:50%;transform:translateX(-50%);text-shadow:0 0 6px var(--aura)}
+
+.center .ct{font-family:'Bebas Neue','Orbitron';font-size:clamp(24px,5vmin,60px);font-weight:900;letter-spacing:clamp(3px,1vmin,14px);color:#fff;z-index:5;text-shadow:4px 4px 0 var(--p5-red),8px 8px 0 #000,0 0 30px rgba(247,147,26,.4);transform:rotate(-1.5deg);line-height:.9}
+.center .csb{font-family:'Bebas Neue';font-size:clamp(7px,.95vmin,12px);color:#fff;background:var(--p5-red);padding:3px 10px;letter-spacing:3px;z-index:5;margin-top:8px;transform:skew(-5deg);box-shadow:3px 3px 0 #000}
+.decks{display:flex;gap:clamp(14px,2.5vmin,32px);margin-top:clamp(12px,2.5vmin,28px);z-index:5}
+.dk{width:clamp(50px,8vmin,100px);height:clamp(68px,11vmin,140px);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:'Bebas Neue';font-weight:700;font-size:clamp(7px,.95vmin,12px);transform:rotate(-2deg);transition:transform .3s}
+.dk:hover{transform:rotate(2deg) scale(1.08)}
+.dk.wp{border:2px solid #3884f4;color:#3884f4;background:rgba(56,132,244,.08);box-shadow:4px 4px 0 #000,inset 0 0 20px rgba(56,132,244,.15)}
+.dk.al{border:2px solid #ef5350;color:#ef5350;background:rgba(239,83,80,.08);box-shadow:4px 4px 0 #000,inset 0 0 20px rgba(239,83,80,.15);transform:rotate(2deg)}
+.dk.al:hover{transform:rotate(-2deg) scale(1.08)}
+.dk .di{font-size:clamp(18px,2.8vmin,32px)}
+.dk .dl{font-size:clamp(5px,.6vmin,8px);opacity:.5}
+
+/* ═══════════ TICKER TAPE ═══════════ */
+.ticker{overflow:hidden;background:linear-gradient(90deg,#000,#111,#000);border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);padding:10px 0;margin:30px 0;box-shadow:0 0 20px rgba(247,147,26,.2),inset 0 0 30px rgba(0,0,0,.7);position:relative}
+.ticker::before,.ticker::after{content:'';position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none}
+.ticker::before{left:0;background:linear-gradient(90deg,#000,transparent)}
+.ticker::after{right:0;background:linear-gradient(270deg,#000,transparent)}
+.ticker-track{display:inline-flex;white-space:nowrap;animation:ticker 60s linear infinite;gap:30px;padding-left:100%}
+.ticker-item{font-family:'JetBrains Mono';font-size:14px;font-weight:700;letter-spacing:1px}
+.ticker-up{color:#0f0;text-shadow:0 0 8px #0f0}
+.ticker-down{color:#f33;text-shadow:0 0 8px #f33}
+.ticker-name{color:#fff;margin-right:8px}
+@keyframes ticker{to{transform:translateX(-100%)}}
+
+/* ═══════════ SECTIONS ═══════════ */
+.section{max-width:1150px;margin:60px auto;padding:0 20px;position:relative}
+.sh{font-family:'Bebas Neue','Orbitron';font-size:clamp(28px,5vw,48px);font-weight:700;text-align:center;letter-spacing:6px;color:#fff;text-shadow:4px 4px 0 var(--p5-red),7px 7px 0 #000;transform:rotate(-1deg);display:inline-block;position:relative;left:50%;translate:-50% 0;line-height:1}
+.ss{text-align:center;color:#9ca2b5;font-size:12px;margin:20px 0 24px;letter-spacing:1px;font-family:'JetBrains Mono'}
+.sd{width:80px;height:4px;background:var(--p5-red);margin:0 auto 28px;transform:skew(-15deg);box-shadow:3px 3px 0 #000}
+
+/* ═══════════ CARDS SECTION - P5 + MARVEL SNAP ═══════════ */
+.cg{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 @media(max-width:900px){.cg{grid-template-columns:repeat(2,1fr)}}
-.gc{background:rgba(8,12,20,.95);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:16px;min-height:140px;display:flex;flex-direction:column;transition:transform .2s}
-.gc:hover{transform:translateY(-2px)}
-.gc .gi{font-size:28px;margin-bottom:8px}
-.gc .gt{font-size:12px;color:#7888a8;line-height:1.6;flex:1}
-.gc .gl{font-family:'Orbitron';font-size:7px;letter-spacing:2px;color:rgba(255,255,255,.08);margin-top:10px}
-.gc.wp{border-top:3px solid #3884f4}
-.gc.al{border-top:3px solid #ef5350}
+.gc{background:linear-gradient(145deg,#0e1420,#0a0e18);border:2px solid var(--border-c);border-radius:8px;padding:18px;min-height:160px;display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s;position:relative;overflow:hidden;box-shadow:4px 4px 0 #000,0 0 30px var(--glow-c)}
+.gc:hover{transform:rotate(1deg) scale(1.04) translateY(-4px);box-shadow:6px 6px 0 #000,0 0 40px var(--glow-c)}
+/* foil shimmer */
+.gc::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,.08) 50%,transparent 70%);pointer-events:none;animation:foil 4s ease-in-out infinite}
+@keyframes foil{0%,100%{transform:translateX(-30%)}50%{transform:translateX(30%)}}
+/* kirby dots on card bg */
+.gc::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.08;
+  background-image:radial-gradient(var(--border-c) 1px,transparent 1.5px);background-size:10px 10px}
+.gc .gi{font-size:36px;margin-bottom:10px;filter:drop-shadow(0 0 10px var(--border-c));position:relative;z-index:2}
+.gc .gt{font-size:13px;color:#c8ceda;line-height:1.6;flex:1;position:relative;z-index:2}
+.gc .gl{font-family:'Bebas Neue';font-size:11px;letter-spacing:3px;color:var(--border-c);margin-top:10px;position:relative;z-index:2;opacity:.7}
+.gc.wp{--border-c:#3884f4;--glow-c:rgba(56,132,244,.3)}
+.gc.al{--border-c:#ef5350;--glow-c:rgba(239,83,80,.3);transform:rotate(-1deg)}
+.gc.al:hover{transform:rotate(-1deg) scale(1.04) translateY(-4px) rotate(2deg)}
 
-.dg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+/* ═══════════ DEEDS ═══════════ */
+.dg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
 @media(max-width:900px){.dg{grid-template-columns:repeat(2,1fr)}}
-.dd{background:rgba(8,12,20,.95);border:1px solid rgba(255,255,255,.03);border-radius:14px;overflow:hidden}
-.dd .db{height:8px}
-.dd .di{padding:12px}
-.dd .dn{font-family:'Orbitron';font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.dd .dn img{width:20px;height:20px;border-radius:50%}
-.dd .dp{font-family:'JetBrains Mono';font-size:10px;color:rgba(255,255,255,.18);margin-bottom:8px}
-.dd .dr{display:flex;justify-content:space-between;font-size:10px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.02)}
-.dd .dr .l{color:rgba(255,255,255,.18)}
-.dd .dr .v{font-family:'JetBrains Mono';font-weight:600}
-.dd .dlv{font-family:'JetBrains Mono';font-size:8px;color:rgba(255,255,255,.12);margin-top:6px;text-align:center}
+.dd{background:rgba(8,12,20,.96);border:2px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;position:relative;transition:transform .3s}
+.dd:hover{transform:translateY(-3px) rotate(.5deg)}
+.dd .db{height:10px;box-shadow:0 0 14px currentColor}
+.dd .di{padding:14px}
+.dd .dn{font-family:'Bebas Neue';font-size:16px;font-weight:700;display:flex;align-items:center;gap:10px;margin-bottom:6px;letter-spacing:1px}
+.dd .dn img{width:26px;height:26px;border-radius:50%;filter:drop-shadow(0 0 6px currentColor)}
+.dd .dp{font-family:'JetBrains Mono';font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px;font-weight:700}
+.dd .dr{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.dd .dr .l{color:rgba(255,255,255,.4);font-family:'JetBrains Mono'}
+.dd .dr .v{font-family:'JetBrains Mono';font-weight:700;color:#fff}
+.dd .dlv{font-family:'Bebas Neue';font-size:10px;color:rgba(255,255,255,.3);margin-top:8px;text-align:center;letter-spacing:2px}
 
+/* ═══════════ RULES ═══════════ */
 .rg{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:700px){.rg{grid-template-columns:1fr}}
-.rb{background:rgba(8,12,20,.9);border:1px solid rgba(255,255,255,.03);border-radius:14px;padding:18px}
-.rb h4{font-family:'Orbitron';font-size:11px;letter-spacing:3px;margin-bottom:10px;color:var(--gold)}
-.rb ul{list-style:none;font-size:12px;line-height:1.8;color:#4a5a7a}
+.rb{background:rgba(8,12,20,.92);border:2px solid rgba(255,255,255,.05);border-radius:10px;padding:20px;box-shadow:4px 4px 0 #000}
+.rb h4{font-family:'Bebas Neue';font-size:16px;letter-spacing:4px;margin-bottom:12px;color:var(--gold);text-shadow:2px 2px 0 #000}
+.rb ul{list-style:none;font-size:13px;line-height:1.9;color:#8a9abf}
 .rb li::before{content:'▸ ';color:var(--gold)}
-.rb table{width:100%;border-collapse:collapse;font-size:11px}
-.rb td,.rb th{padding:4px 6px;text-align:left;border-bottom:1px solid rgba(255,255,255,.02)}
-.rb th{color:#3a4a5a;font-size:9px;text-transform:uppercase;letter-spacing:1px}
-.footer{text-align:center;padding:40px;color:#080c14;font-size:9px;letter-spacing:3px;font-family:'Orbitron'}
+.rb table{width:100%;border-collapse:collapse;font-size:12px;font-family:'JetBrains Mono'}
+.rb td,.rb th{padding:5px 8px;text-align:left;border-bottom:1px solid rgba(255,255,255,.03)}
+.rb th{color:#6a7a9a;font-size:10px;text-transform:uppercase;letter-spacing:1px}
+.rb .hi{color:var(--gold);font-weight:700}
+
+.footer{text-align:center;padding:50px;color:#0a0e16;font-size:11px;letter-spacing:3px;font-family:'Bebas Neue'}
 </style>
 </head>
 <body>
@@ -191,26 +319,53 @@ body{background:var(--bg);color:#d0d8e8;font-family:'Inter',sans-serif;overflow-
   <img class="titan vitalik" src="img/vitalik.jpg" alt="">
   <img class="titan satoshi" src="img/satoshi.jpg" alt="">
 </div>
+
 <div class="content">
-<div class="hero"><h1>CRYPTOPOLY</h1><div class="sub">THE CRYPTO BOARD GAME</div></div>
-<div class="board-wrap"><div class="board" id="board"></div></div>
-<div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;max-width:1100px;margin:16px auto;font-size:11px;color:#2a3a5a">
-  <span><b style="color:#8B5E3C">■</b> Meme</span><span><b style="color:#29B6F6">■</b> L2</span><span><b style="color:#EC407A">■</b> DeFi</span><span><b style="color:#FF9800">■</b> Viral</span><span><b style="color:#EF5350">■</b> CEX</span><span><b style="color:#FFD600">■</b> Top CEX</span><span><b style="color:#66BB6A">■</b> Premium L1</span><span><b style="color:#1E88E5">■</b> Legends</span><span><b style="color:#546E7A">■</b> Wallets</span><span><b style="color:#AB47BC">■</b> Infra</span>
+
+<div class="hero">
+  <h1>CRYPTOPOLY</h1>
+  <div class="sub">DEGEN EDITION</div>
 </div>
-<div class="section"><div class="sh">WHITE PAPER CARDS</div><div class="ss">Protocol & Community Events</div><div class="sd"></div><div class="cg" id="wg"></div></div>
-<div class="section"><div class="sh">ALPHA CARDS</div><div class="ss">Market, Speculation & Chaos</div><div class="sd"></div><div class="cg" id="ag"></div></div>
+
+<!-- Ticker Tape -->
+<div class="ticker"><div class="ticker-track" id="ticker-track"></div></div>
+
+<div class="board-wrap"><div class="board" id="board"></div></div>
+
+<div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center;max-width:1100px;margin:16px auto;font-size:11px;color:#6a7a9a;font-family:'JetBrains Mono'">
+  <span><b style="color:#3D8130">■</b> MEME</span>
+  <span><b style="color:#29B6F6">■</b> L2</span>
+  <span><b style="color:#EC407A">■</b> DeFi</span>
+  <span><b style="color:#FF9800">■</b> VIRAL</span>
+  <span><b style="color:#EF5350">■</b> CEX</span>
+  <span><b style="color:#FFD600">■</b> TOP CEX</span>
+  <span><b style="color:#66BB6A">■</b> PREMIUM L1</span>
+  <span><b style="color:#1E88E5">■</b> LEGENDS</span>
+  <span><b style="color:#546E7A">■</b> WALLET</span>
+  <span><b style="color:#AB47BC">■</b> INFRA</span>
+</div>
+
+<!-- Ticker Tape -->
+<div class="ticker"><div class="ticker-track" id="ticker-track-2"></div></div>
+
+<div class="section"><div class="sh">WHITE PAPER</div><div class="ss">Protocol & Community Events</div><div class="sd"></div><div class="cg" id="wg"></div></div>
+<div class="section"><div class="sh">ALPHA</div><div class="ss">Market, Speculation & Chaos</div><div class="sd"></div><div class="cg" id="ag"></div></div>
 <div class="section"><div class="sh">PROPERTY DEEDS</div><div class="ss">Title Deed Cards</div><div class="sd"></div><div class="dg" id="dg"></div></div>
-<div class="section"><div class="sh">RULES</div><div class="ss">Quick Reference</div><div class="sd"></div>
+
+<div class="section">
+<div class="sh">RULES</div><div class="ss">Quick Reference</div><div class="sd"></div>
 <div class="rg">
-  <div class="rb"><h4>SETUP</h4><ul><li>2-6 players, 1,500 USDT each</li><li>Start on AIRDROP ZONE</li><li>Shuffle both decks</li><li>Youngest degen first, clockwise</li></ul></div>
+  <div class="rb"><h4>SETUP</h4><ul><li>2-6 degens, 1,500 USDT each</li><li>Start on AIRDROP ZONE</li><li>Shuffle both decks</li><li>Youngest degen first, clockwise</li></ul></div>
   <div class="rb"><h4>ON YOUR TURN</h4><ul><li>Roll 2 dice, move clockwise</li><li>Doubles = roll again (3 = SEC)</li><li>Pass AIRDROP = collect 200 USDT</li><li>Unowned = buy or auction</li><li>Owned = pay rent</li></ul></div>
-  <div class="rb"><h4>LEVERAGE</h4><table><tr><th>Lvl</th><th>Old</th><th>Crypto</th></tr><tr><td>0</td><td>—</td><td>Spot</td></tr><tr><td>1</td><td>1 house</td><td>2x</td></tr><tr><td>2</td><td>2 houses</td><td>5x</td></tr><tr><td>3</td><td>3 houses</td><td>10x</td></tr><tr><td>4</td><td>4 houses</td><td>25x</td></tr><tr><td>5</td><td>Hotel</td><td style="color:#f7931a">100x DEGEN</td></tr></table></div>
+  <div class="rb"><h4>LEVERAGE</h4><table><tr><th>Lvl</th><th>Crypto</th></tr><tr><td>0</td><td>Spot</td></tr><tr><td>1</td><td>2x</td></tr><tr><td>2</td><td>5x</td></tr><tr><td>3</td><td>10x</td></tr><tr><td>4</td><td>25x</td></tr><tr><td>5</td><td class="hi">100x DEGEN</td></tr></table></div>
   <div class="rb"><h4>SEC DETENTION</h4><ul><li>CFTC = go to SEC, no airdrop</li><li>Out: pay 50, card, or doubles</li><li>3 fails = forced 50 + move</li><li>100x + 3 doubles = LIQUIDATED</li></ul></div>
-  <div class="rb"><h4>WALLETS</h4><table><tr><th>Own</th><th>Fee</th></tr><tr><td>1</td><td>25</td></tr><tr><td>2</td><td>50</td></tr><tr><td>3</td><td>100</td></tr><tr><td>4</td><td style="color:#f7931a">200</td></tr></table></div>
+  <div class="rb"><h4>WALLETS</h4><table><tr><th>Own</th><th>Fee</th></tr><tr><td>1</td><td>25</td></tr><tr><td>2</td><td>50</td></tr><tr><td>3</td><td>100</td></tr><tr><td>4</td><td class="hi">200</td></tr></table></div>
   <div class="rb"><h4>WINNING</h4><ul><li>Can't pay = LIQUIDATED = rekt</li><li>Properties return to bank</li><li>Last degen = THE WHALE</li><li>All currency in USDT</li></ul></div>
 </div></div>
-<div class="footer">CRYPTOPOLY &copy; 2025</div>
+
+<div class="footer">CRYPTOPOLY &copy; 2026 &mdash; BUILT FOR DEGENS</div>
 </div>
+
 <script>
 const L=n=>`https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/${n}/large.png`;
 const XC=n=>`https://assets.coingecko.com/markets/images/${n}`;
@@ -218,7 +373,6 @@ const LOGOS={'DOGE':L('dogecoin'),'PEPE':L('pepe'),'Bitcoin':L('bitcoin'),'Ether
 const FB={'DOGE':'🐕','PEPE':'🐸','TRUMP':'🏛','TRON':'⚡','XRP':'✕','Bitcoin':'₿','Ethereum':'⟠','Solana':'◎','BNB Chain':'◆','Sui':'💧','Arbitrum':'🔷','Optimism':'🔴','Base':'🔵','Uniswap':'🦄','Aave':'👻','MakerDAO':'Ⓜ','Kraken':'🐙','Bitget':'▲','Coinbase':'◉','Bybit':'▶','OKX':'⊕','Binance':'◆','MetaMask':'🦊','Phantom':'👻','Trust Wallet':'🛡','Ledger':'🔒','Gas Station':'⛽','MEV Bot':'🤖'};
 const GC={brown:'#8B5E3C',lightblue:'#29B6F6',pink:'#EC407A',orange:'#FF9800',red:'#EF5350',yellow:'#FFD600',green:'#66BB6A',darkblue:'#1E88E5',wallet:'#546E7A',utility:'#AB47BC'};
 const LC={brown:50,lightblue:50,pink:100,orange:100,red:150,yellow:150,green:200,darkblue:200};
-// Canonical brand colors [primary, secondary] per entity
 const BRAND={
   'Bitcoin':['#F7931A','#FFB84D'],'Ethereum':['#627EEA','#8247E5'],
   'DOGE':['#C2A633','#E5C74A'],'PEPE':['#3D8130','#4E9741'],'TRUMP':['#E11D48','#1E3A8A'],
@@ -232,8 +386,13 @@ const BRAND={
   'Trust Wallet':['#3375BB','#48ADEF'],'Ledger':['#BDBDBD','#FFFFFF'],
   'Gas Station':['#FF6F00','#FFA040'],'MEV Bot':['#9C27B0','#C154DE'],
   'AIRDROP':['#14F195','#0FBA6E'],'SEC':['#78909C','#455A64'],
-  'HODL':['#42A5F5','#1E88E5'],'CFTC':['#EF5350','#C62828'],
+  'HODL':['#42A5F5','#1E88E5'],'CFTC':['#EF5350','#C62828']
 };
+const TIER={
+  brown:'meme',lightblue:'l2',pink:'defi',orange:'viral',
+  red:'cex',yellow:'topcex',green:'premium',darkblue:'legend'
+};
+
 const SQ=[
 {id:0,t:'go',n:'AIRDROP',ic:'✈️',d:'COLLECT 200 USDT'},{id:1,t:'p',n:'PEPE',g:'brown',$:60,r:[2,10,30,90,160,250]},{id:2,t:'wp'},{id:3,t:'p',n:'TRUMP',g:'brown',$:60,r:[4,20,60,180,320,450]},{id:4,t:'tx',n:'GAS FEE',ic:'⛽',d:'PAY 200'},{id:5,t:'w',n:'MetaMask',$:200},{id:6,t:'p',n:'Optimism',g:'lightblue',$:100,r:[6,30,90,270,400,550]},{id:7,t:'al'},{id:8,t:'p',n:'Arbitrum',g:'lightblue',$:100,r:[6,30,90,270,400,550]},{id:9,t:'p',n:'Base',g:'lightblue',$:120,r:[8,40,100,300,450,600]},{id:10,t:'jail',n:'SEC',ic:'🏛',d:'DETENTION'},{id:11,t:'p',n:'MakerDAO',g:'pink',$:140,r:[10,50,150,450,625,750]},{id:12,t:'u',n:'Gas Station',$:150},{id:13,t:'p',n:'Aave',g:'pink',$:140,r:[10,50,150,450,625,750]},{id:14,t:'p',n:'Uniswap',g:'pink',$:160,r:[12,60,180,500,700,900]},{id:15,t:'w',n:'Phantom',$:200},{id:16,t:'p',n:'Sui',g:'orange',$:180,r:[14,70,200,550,750,950]},{id:17,t:'wp'},{id:18,t:'p',n:'TRON',g:'orange',$:180,r:[14,70,200,550,750,950]},{id:19,t:'p',n:'DOGE',g:'orange',$:200,r:[16,80,220,600,800,1000]},{id:20,t:'pk',n:'HODL',ic:'💎',d:'LOUNGE'},{id:21,t:'p',n:'Kraken',g:'red',$:220,r:[18,90,250,700,875,1050]},{id:22,t:'al'},{id:23,t:'p',n:'Bitget',g:'red',$:220,r:[18,90,250,700,875,1050]},{id:24,t:'p',n:'Coinbase',g:'red',$:240,r:[20,100,300,750,925,1100]},{id:25,t:'w',n:'Trust Wallet',$:200},{id:26,t:'p',n:'Bybit',g:'yellow',$:260,r:[22,110,330,800,975,1150]},{id:27,t:'p',n:'OKX',g:'yellow',$:260,r:[22,110,330,800,975,1150]},{id:28,t:'u',n:'MEV Bot',$:150},{id:29,t:'p',n:'Binance',g:'yellow',$:280,r:[24,120,360,850,1025,1200]},{id:30,t:'gj',n:'CFTC',ic:'🚨',d:'ENFORCEMENT'},{id:31,t:'p',n:'Solana',g:'green',$:300,r:[26,130,390,900,1100,1275]},{id:32,t:'p',n:'BNB Chain',g:'green',$:300,r:[26,130,390,900,1100,1275]},{id:33,t:'wp'},{id:34,t:'p',n:'XRP',g:'green',$:320,r:[28,150,450,1000,1200,1400]},{id:35,t:'w',n:'Ledger',$:200},{id:36,t:'al'},{id:37,t:'p',n:'Ethereum',g:'darkblue',$:350,r:[35,175,500,1100,1300,1500]},{id:38,t:'tx',n:'WHALE TAX',ic:'🐋',d:'PAY 100'},{id:39,t:'p',n:'Bitcoin',g:'darkblue',$:400,r:[50,200,600,1400,1700,2000]}
 ];
@@ -242,6 +401,7 @@ const GP={};
 [11,12,13,14,15,16,17,18,19].forEach((id,i)=>GP[id]=[10-i,1]);
 [20,21,22,23,24,25,26,27,28,29,30].forEach((id,i)=>GP[id]=[1,i+1]);
 [31,32,33,34,35,36,37,38,39].forEach((id,i)=>GP[id]=[i+2,11]);
+
 const WPC=[{i:'🪂',t:'Token airdrop from a blue-chip project! Collect 50 USDT'},{i:'🥩',t:'Your validator earned staking rewards. Collect 100 USDT'},{i:'🏛️',t:"Trump's World Liberty Financial bought your token! Collect 200 USDT"},{i:'🪐',t:'Jupiter airdrop! You qualified! Collect 150 USDT'},{i:'🐛',t:'Bug bounty! Critical vuln found. Collect 250 USDT'},{i:'💀',t:'Bybit hacked by Lazarus Group! $1.5B stolen. Pay 200 USDT insurance'},{i:'🗳️',t:'Governance proposal passed. Collect 25 USDT from each player'},{i:'🐕',t:"Elon's DOGE Department efficiency bonus! Collect 100 USDT"},{i:'📋',t:'IRS audit on your DeFi gains. Pay 150 USDT'},{i:'🔑',t:'GET OUT OF SEC FREE! Keep this card.'},{i:'🧹',t:'RUG PULL on Pump.fun livestream! Dev burned LP. Pay 100 USDT'},{i:'📢',t:'Memecoin went viral on CT! Collect 50 USDT from each player'},{i:'📉',t:'Impermanent loss on your LP. Pay 75 USDT'},{i:'🍌',t:'Justin Sun bought a $6.2M banana and ate it live. Collect 100 USDT'},{i:'🏆',t:'Elected DAO council member. Collect 50 USDT'},{i:'🌉',t:'Bridge exploit! Funds stuck. Pay 150 USDT'}];
 const ALC=[{i:'🐕',t:'Elon tweeted DOGE to the moon! Advance to DOGE'},{i:'🔑',t:'SEC drops investigation. GET OUT OF SEC FREE!'},{i:'🪂',t:'New airdrop season! Advance to AIRDROP ZONE'},{i:'💥',t:'Bitcoin flash crash! Pay each player 50 USDT'},{i:'🇺🇸',t:'Trump signed pro-crypto executive order! Advance to TRUMP'},{i:'🐳',t:'Whale alert! 10K BTC moved. Go back 3 spaces'},{i:'🏴‍☠️',t:'Gen Z kid rug-pulled on Pump.fun livestream! Go to SEC'},{i:'4️⃣',t:'CZ pardoned by Trump! Standing ovation. Advance to Binance'},{i:'💜',t:'Vitalik endorsed your project! Advance to Ethereum'},{i:'📊',t:'Funding rate -0.1%. Short squeeze! Pay 100 USDT'},{i:'🔥',t:'100x long LIQUIDATED! Pay 200 USDT'},{i:'🤫',t:'Inside alpha! Advance to nearest exchange, pay 2x rent'},{i:'🐸',t:'Elon became Kekius Maximus! Advance to PEPE'},{i:'⚖️',t:"Gensler's ghost: your token is a security! Go to SEC"},{i:'💎',t:'Aped 100x gem on Pump.fun! Collect 300 USDT'},{i:'🍌',t:'Justin Sun ate a $6.2M banana on camera. Collect 150 USDT'}];
 
@@ -251,24 +411,67 @@ function mkL(name){
   return `<div class="lg"><span class="fb">${fb}</span></div>`;
 }
 
+// === TICKER ===
+function buildTicker(trackId){
+  const coins=[
+    ['BTC',108432,1.2],['ETH',3821,-0.8],['SOL',198,5.4],['BNB',682,0.3],
+    ['XRP',2.14,-2.1],['DOGE',0.32,8.7],['PEPE',0.000018,12.4],['TRUMP',12.4,-6.3],
+    ['TRON',0.28,1.8],['SUI',4.12,3.2],['ARB',0.82,-1.1],['OP',1.92,2.8],
+    ['UNI',14.2,-0.5],['AAVE',284,1.9],['MKR',1842,-3.2]
+  ];
+  const el=document.getElementById(trackId);
+  let html='';
+  for(let i=0;i<3;i++){
+    coins.forEach(([sym,price,chg])=>{
+      const up=chg>=0,arr=up?'▲':'▼',cls=up?'ticker-up':'ticker-down';
+      html+=`<span class="ticker-item"><span class="ticker-name">${sym}</span>$${price.toLocaleString(undefined,{maximumFractionDigits:6})} <span class="${cls}">${arr}${Math.abs(chg).toFixed(2)}%</span></span>`;
+    });
+  }
+  el.innerHTML=html;
+}
+
 (function(){
   const b=document.getElementById('board');
-  b.innerHTML=`<div class="center"><div class="ct-faces"><img src="img/trump.jpg"><img src="img/elon.jpg"><img src="img/cz.jpg"><img src="img/vitalik.jpg"></div><div class="ct">CRYPTOPOLY</div><div class="csb">THE CRYPTO BOARD GAME</div><div class="decks"><div class="dk wp"><span class="di">📄</span>White Paper<span class="dl">16 CARDS</span></div><div class="dk al"><span class="di">🎲</span>Alpha<span class="dl">16 CARDS</span></div></div></div>`;
+  // Center with JoJo titan aurals
+  b.innerHTML=`<div class="center">
+    <div class="jojo-ring">
+      <div class="jojo trump"><img src="img/trump.jpg"><div class="jojo-label">TRUMP</div></div>
+      <div class="jojo elon"><img src="img/elon.jpg"><div class="jojo-label">ELON</div></div>
+      <div class="jojo cz"><img src="img/cz.jpg"><div class="jojo-label">CZ</div></div>
+      <div class="jojo vitalik"><img src="img/vitalik.jpg"><div class="jojo-label">VITALIK</div></div>
+      <div class="jojo satoshi"><img src="img/satoshi.jpg"><div class="jojo-label">SATOSHI</div></div>
+    </div>
+    <div class="ct">CRYPTOPOLY</div>
+    <div class="csb">THE CRYPTO BOARD GAME</div>
+    <div class="decks">
+      <div class="dk wp"><span class="di">📄</span>WHITE PAPER<span class="dl">16 CARDS</span></div>
+      <div class="dk al"><span class="di">🎲</span>ALPHA<span class="dl">16 CARDS</span></div>
+    </div></div>`;
+
+  // Pump/dump random selection
+  const propIds=SQ.filter(s=>s.t==='p').map(s=>s.id);
+  const shuffled=[...propIds].sort(()=>Math.random()-0.5);
+  const pumpIds=new Set(shuffled.slice(0,3));
+  const dumpIds=new Set(shuffled.slice(3,5));
+
   SQ.forEach(sq=>{
     const[r,c]=GP[sq.id];const s=r===1?'t':r===11?'b':c===1?'l':c===11?'r':'';
-    const e=document.createElement('div');e.className='c';e.style.gridRow=r;e.style.gridColumn=c;e.setAttribute('data-s',s);let h='';
-    // apply brand theme
+    const e=document.createElement('div');e.className='c';e.style.gridRow=r;e.style.gridColumn=c;e.setAttribute('data-s',s);
     const brand=BRAND[sq.n]||[GC[sq.g]||'#888','#555'];
     e.style.setProperty('--b1',brand[0]);e.style.setProperty('--b2',brand[1]);
+    if(sq.g)e.setAttribute('data-tier',TIER[sq.g]||'');
     if(sq.n==='Bitcoin'||sq.n==='Ethereum')e.setAttribute('data-tier','legend');
+    if(pumpIds.has(sq.id))e.setAttribute('data-mode','pump');
+    if(dumpIds.has(sq.id))e.setAttribute('data-mode','dump');
+    let h='';
     switch(sq.t){
       case'go':case'jail':case'pk':case'gj':e.classList.add('corner');h=`<span class="ic">${sq.ic}</span><span class="nm">${sq.n}</span><span class="sub">${sq.d||''}</span>`;break;
       case'p':e.classList.add('prop');h=`<div class="bar" style="background:linear-gradient(90deg,${brand[0]},${brand[1]})"></div>${mkL(sq.n)}<span class="nm">${sq.n}</span><span class="pr">${sq.$}</span>`;break;
       case'w':e.classList.add('wcell');h=`<div class="bar" style="background:linear-gradient(90deg,${brand[0]},${brand[1]})"></div>${mkL(sq.n)}<span class="nm">${sq.n}</span><span class="pr">${sq.$}</span>`;break;
       case'u':e.classList.add('ucell');h=`<div class="bar" style="background:linear-gradient(90deg,${brand[0]},${brand[1]})"></div>${mkL(sq.n)}<span class="nm">${sq.n}</span><span class="pr">${sq.$}</span>`;break;
-      case'wp':e.classList.add('cwp');h=`<span class="ic" style="font-size:clamp(16px,2.8vmin,28px)">📄</span><span class="nm" style="color:#3884f4">WHITE<br>PAPER</span>`;break;
-      case'al':e.classList.add('cal');h=`<span class="ic" style="font-size:clamp(16px,2.8vmin,28px)">🎲</span><span class="nm" style="color:#ef5350">ALPHA</span>`;break;
-      case'tx':e.classList.add('ctx');h=`<span class="ic" style="font-size:clamp(16px,2.8vmin,28px)">${sq.ic}</span><span class="nm">${sq.n}</span><span class="pr" style="color:#FF9800">${sq.d}</span>`;break;
+      case'wp':e.classList.add('cwp');h=`<span class="ic" style="font-size:clamp(16px,2.8vmin,32px);filter:drop-shadow(0 0 10px #3884f4)">📄</span><span class="nm" style="color:#3884f4;text-shadow:0 0 10px #3884f4">WHITE<br>PAPER</span>`;break;
+      case'al':e.classList.add('cal');h=`<span class="ic" style="font-size:clamp(16px,2.8vmin,32px);filter:drop-shadow(0 0 10px #ef5350)">🎲</span><span class="nm" style="color:#ef5350;text-shadow:0 0 10px #ef5350">ALPHA</span>`;break;
+      case'tx':e.classList.add('ctx');h=`<span class="ic" style="font-size:clamp(16px,2.8vmin,32px);filter:drop-shadow(0 0 10px #FF9800)">${sq.ic}</span><span class="nm">${sq.n}</span><span class="pr" style="color:#FF9800">${sq.d}</span>`;break;
     }
     e.innerHTML=h;b.appendChild(e);
   });
@@ -277,8 +480,10 @@ function mkL(name){
   ALC.forEach(c=>{ag.innerHTML+=`<div class="gc al"><span class="gi">${c.i}</span><div class="gt">${c.t}</div><div class="gl">ALPHA</div></div>`});
   SQ.filter(s=>s.t==='p').forEach(sq=>{
     const col=GC[sq.g],lc=LC[sq.g],url=LOGOS[sq.n],img=url?`<img src="${url}" onerror="this.style.display='none'">`:'';
-    dg.innerHTML+=`<div class="dd"><div class="db" style="background:${col}"></div><div class="di"><div class="dn" style="color:${col}">${img}${sq.n}</div><div class="dp">PRICE: ${sq.$} USDT</div><div class="dr"><span class="l">Spot</span><span class="v">${sq.r[0]}</span></div><div class="dr"><span class="l">Full set</span><span class="v">${sq.r[0]*2}</span></div><div class="dr"><span class="l">2x</span><span class="v">${sq.r[1]}</span></div><div class="dr"><span class="l">5x</span><span class="v">${sq.r[2]}</span></div><div class="dr"><span class="l">10x</span><span class="v">${sq.r[3]}</span></div><div class="dr"><span class="l">25x</span><span class="v">${sq.r[4]}</span></div><div class="dr"><span class="l" style="color:${col}">100x</span><span class="v" style="color:${col}">${sq.r[5]}</span></div><div class="dlv">Leverage: ${lc}/ea</div></div></div>`;
+    dg.innerHTML+=`<div class="dd" style="--col:${col}"><div class="db" style="background:${col};color:${col}"></div><div class="di"><div class="dn" style="color:${col}">${img}${sq.n}</div><div class="dp">PRICE: ${sq.$} USDT</div><div class="dr"><span class="l">Spot</span><span class="v">${sq.r[0]}</span></div><div class="dr"><span class="l">Full set</span><span class="v">${sq.r[0]*2}</span></div><div class="dr"><span class="l">2x</span><span class="v">${sq.r[1]}</span></div><div class="dr"><span class="l">5x</span><span class="v">${sq.r[2]}</span></div><div class="dr"><span class="l">10x</span><span class="v">${sq.r[3]}</span></div><div class="dr"><span class="l">25x</span><span class="v">${sq.r[4]}</span></div><div class="dr"><span class="l" style="color:${col}">100x</span><span class="v" style="color:${col}">${sq.r[5]}</span></div><div class="dlv">LEVERAGE: ${lc}/EA</div></div></div>`;
   });
+  buildTicker('ticker-track');
+  buildTicker('ticker-track-2');
 })();
 </script>
 </body>

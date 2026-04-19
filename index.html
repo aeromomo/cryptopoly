@@ -1080,10 +1080,22 @@ async function walkSteps(n){
       popup('TAX -'+(sq.n.includes('WHALE')?100:200),'down');
       if(window.PLAYER){window.PLAYER.money-=(sq.n.includes('WHALE')?100:200);updateMoney()}
       pushEvent(`${pname} PAID ${sq.n}`,'down');
-    }else if(sq.t==='jail'||sq.t==='gj'){
+    }else if(sq.t==='jail'){
+      // just visiting
+      label='🏛 SEC (Just Visiting)';
+      pushEvent(`${pname} IS JUST VISITING SEC`,'neutral');
+    }else if(sq.t==='gj'){
+      // CFTC - teleport to SEC
       dingLose();
-      popup('SEC DETENTION','down');
-      pushEvent(`${pname} SENT TO SEC DETENTION`,'down');
+      popup('🚨 SEC DETENTION','down');
+      pushEvent(`${pname} SENT TO SEC DETENTION BY CFTC`,'down');
+      setTimeout(()=>{
+        window.playerPos=10;
+        placeToken(10,true);
+        const secEl=document.querySelector('.c[data-sqid="10"]');
+        if(secEl){secEl.classList.add('land-flash');setTimeout(()=>secEl.classList.remove('land-flash'),1200)}
+      },1000);
+      label='🚨 GOING TO SEC';
     }else if(sq.t==='go'){
       dingWin();
       popup('+200 AIRDROP','up');
@@ -1091,15 +1103,21 @@ async function walkSteps(n){
       pushEvent(`${pname} LANDED ON AIRDROP +200`,'special');
     }else if(sq.t==='wp'){
       chaChing();
-      popup('WHITE PAPER','gold');
+      popup('📄 WHITE PAPER','gold');
       pushEvent(`${pname} DREW WHITE PAPER CARD`,'special');
+      label='📄 WHITE PAPER';
     }else if(sq.t==='al'){
       chaChing();
-      popup('ALPHA LEAK','gold');
+      popup('🎲 ALPHA LEAK','gold');
       pushEvent(`${pname} DREW ALPHA CARD`,'special');
+      label='🎲 ALPHA LEAK';
+    }else if(sq.t==='pk'){
+      chaChing();
+      label='💎 HODL LOUNGE';
+      pushEvent(`${pname} IS HODLING AT HODL LOUNGE 💎🙌`,'neutral');
     }else{
       chaChing();
-      pushEvent(`${pname} LANDED ON ${sq.n}`,'neutral');
+      pushEvent(`${pname} LANDED ON ${sq.n||'?'}`,'neutral');
     }
     dd.textContent='📍 '+label;
   }

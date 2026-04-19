@@ -12,10 +12,32 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:#d0d8e8;font-family:'Inter',sans-serif;overflow-x:hidden;position:relative}
 
-/* ═══════════ BACKGROUND GRID (subtle blueprint) ═══════════ */
+/* ═══════════ BACKGROUND GRID (trading terminal) ═══════════ */
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(247,147,26,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(247,147,26,.03) 1px,transparent 1px);
+  background-image:linear-gradient(rgba(247,147,26,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(247,147,26,.04) 1px,transparent 1px);
   background-size:60px 60px}
+
+/* ═══════════ K-LINE CANDLE BACKGROUND ═══════════ */
+#kline-bg{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.35;mix-blend-mode:screen}
+
+/* ═══════════ RED/BLACK DIAGONAL SLASHES THROUGH TITANS ═══════════ */
+.titan-bg::after{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:
+    repeating-linear-gradient(135deg,transparent 0,transparent 80px,rgba(225,29,72,.08) 80px,rgba(225,29,72,.08) 100px,transparent 100px,transparent 160px,rgba(0,0,0,.35) 160px,rgba(0,0,0,.35) 200px);
+  mix-blend-mode:multiply}
+
+/* ═══════════ TITAN LASER EYES (JoJo titans) ═══════════ */
+.jojo::after{content:'';position:absolute;left:-40%;right:-40%;top:38%;height:3px;background:linear-gradient(90deg,transparent,var(--aura),#fff,var(--aura),transparent);box-shadow:0 0 12px var(--aura),0 0 24px var(--aura),0 0 4px #fff;z-index:3;opacity:0;animation:laser-eye 5s ease-in-out infinite;animation-delay:var(--laser-delay,0s)}
+@keyframes laser-eye{0%,85%,100%{opacity:0;transform:scaleX(0)}90%{opacity:1;transform:scaleX(1)}95%{opacity:.8;transform:scaleX(1)}}
+.jojo.trump{--laser-delay:0s}
+.jojo.elon{--laser-delay:.7s}
+.jojo.cz{--laser-delay:1.4s}
+.jojo.vitalik{--laser-delay:2.1s}
+.jojo.satoshi{--laser-delay:2.8s}
+/* alternating face tint on titans */
+.jojo.trump img,.jojo.cz img{filter:grayscale(20%) contrast(1.3) brightness(.9) sepia(30%) hue-rotate(-20deg) saturate(1.4)}
+.jojo.elon img,.jojo.vitalik img{filter:grayscale(40%) contrast(1.4) brightness(.75)}
+.jojo.satoshi img{filter:grayscale(100%) brightness(.5) contrast(2.5)}
 
 /* ═══════════ TITAN BACKGROUND ═══════════ */
 .titan-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
@@ -247,6 +269,25 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .dk .di{font-size:clamp(18px,2.8vmin,32px)}
 .dk .dl{font-size:clamp(5px,.6vmin,8px);opacity:.5}
 
+/* ═══════════ EVENT TICKER (TOP - trading terminal style) ═══════════ */
+.event-bar{position:fixed;top:0;left:0;right:0;z-index:60;background:linear-gradient(90deg,#000,#0a0a0a 15%,#0a0a0a 85%,#000);border-bottom:2px solid #FFD700;box-shadow:0 0 20px rgba(255,215,0,.25);display:flex;align-items:center;height:40px;font-family:'JetBrains Mono';font-size:12px;font-weight:700;padding:0 16px;backdrop-filter:blur(10px)}
+.event-bar .label{color:#FFD700;letter-spacing:3px;margin-right:16px;text-shadow:0 0 8px #FFD700;flex-shrink:0;font-family:'Bebas Neue';font-size:14px;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,60%,100%{opacity:1}70%,80%{opacity:.3}}
+.event-bar .feed{overflow:hidden;flex:1;position:relative}
+.event-bar .feed-inner{display:flex;gap:30px;white-space:nowrap;animation:scroll-left 45s linear infinite;padding-left:100%}
+@keyframes scroll-left{to{transform:translateX(-100%)}}
+.event-bar .event-up{color:#0f0;text-shadow:0 0 6px #0f0}
+.event-bar .event-down{color:#f33;text-shadow:0 0 6px #f33}
+.event-bar .event-neutral{color:#fff}
+.event-bar .event-special{color:#FFD700;text-shadow:0 0 8px #FFD700}
+body{padding-top:40px}
+
+/* ═══════════ POPUP MESSAGE (centered on action) ═══════════ */
+.popup-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;font-family:'Bebas Neue';font-size:clamp(32px,6vw,80px);letter-spacing:6px;font-weight:700;text-align:center;pointer-events:none;opacity:0}
+.popup-msg.up{color:#0f0;text-shadow:5px 5px 0 #000,0 0 30px #0f0,0 0 60px #0f0}
+.popup-msg.down{color:#f33;text-shadow:5px 5px 0 #000,0 0 30px #f33,0 0 60px #f33}
+.popup-msg.gold{color:#FFD700;text-shadow:5px 5px 0 #000,0 0 40px #FFD700,0 0 80px #FF6B00}
+
 /* ═══════════ TICKER TAPE ═══════════ */
 .ticker{overflow:hidden;background:linear-gradient(90deg,#000,#111,#000);border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);padding:10px 0;margin:30px 0;box-shadow:0 0 20px rgba(247,147,26,.2),inset 0 0 30px rgba(0,0,0,.7);position:relative}
 .ticker::before,.ticker::after{content:'';position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none}
@@ -393,6 +434,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 </style>
 </head>
 <body>
+
+<!-- ═══ TOP EVENT BAR (trading terminal) ═══ -->
+<div class="event-bar">
+  <span class="label">▶ LIVE</span>
+  <div class="feed"><div class="feed-inner" id="event-feed"></div></div>
+</div>
+
+<!-- K-line candle background -->
+<canvas id="kline-bg"></canvas>
 
 <!-- ═══ CHARACTER SELECT OVERLAY ═══ -->
 <div id="char-select" class="char-overlay">
@@ -679,6 +729,8 @@ function buildTicker(trackId){
   });
   buildTicker('ticker-track');
   buildTicker('ticker-track-2');
+  renderEventFeed();
+  drawKline();
 
   // === GSAP ENTRANCE + JOJO AURAS ===
   if(window.gsap){
@@ -755,7 +807,7 @@ function landBoom(pos){
   }
 }
 
-// === AUDIO (biubiubiu) ===
+// === AUDIO (biubiubiu + ding ding) ===
 let audioCtx=null;
 function ac(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx}
 function biu(freq=800,dur=.08){
@@ -779,6 +831,167 @@ function jackpot(){
     o.start(t+i*.07);o.stop(t+i*.07+.1);
   });
 }
+// ding ding WIN - cheerful rising 3-tone
+function dingWin(){
+  const c=ac(),t=c.currentTime;
+  [660,880,1320].forEach((f,i)=>{
+    const o=c.createOscillator(),g=c.createGain();
+    o.type='sine';o.frequency.value=f;
+    g.gain.setValueAtTime(0,t+i*.1);
+    g.gain.exponentialRampToValueAtTime(.15,t+i*.1+.02);
+    g.gain.exponentialRampToValueAtTime(.001,t+i*.1+.25);
+    o.connect(g).connect(c.destination);
+    o.start(t+i*.1);o.stop(t+i*.1+.25);
+  });
+}
+// ding ding LOSE - sad descending 3-tone
+function dingLose(){
+  const c=ac(),t=c.currentTime;
+  [440,330,220].forEach((f,i)=>{
+    const o=c.createOscillator(),g=c.createGain();
+    o.type='sawtooth';o.frequency.value=f;
+    g.gain.setValueAtTime(0,t+i*.15);
+    g.gain.exponentialRampToValueAtTime(.1,t+i*.15+.02);
+    g.gain.exponentialRampToValueAtTime(.001,t+i*.15+.3);
+    o.connect(g).connect(c.destination);
+    o.start(t+i*.15);o.stop(t+i*.15+.3);
+  });
+}
+// cash register cha-ching
+function chaChing(){
+  const c=ac(),t=c.currentTime;
+  [1800,1400,2200].forEach((f,i)=>{
+    const o=c.createOscillator(),g=c.createGain();
+    o.type='square';o.frequency.value=f;
+    g.gain.setValueAtTime(.08,t+i*.04);
+    g.gain.exponentialRampToValueAtTime(.001,t+i*.04+.08);
+    o.connect(g).connect(c.destination);
+    o.start(t+i*.04);o.stop(t+i*.04+.08);
+  });
+}
+
+// ═══ POPUP MESSAGE ═══
+function popup(msg,type='gold'){
+  const el=document.createElement('div');
+  el.className='popup-msg '+type;
+  el.textContent=msg;
+  document.body.appendChild(el);
+  if(window.gsap){
+    gsap.fromTo(el,{scale:0,rotation:-15,opacity:0},{scale:1.1,rotation:0,opacity:1,duration:.3,ease:'back.out(2)'});
+    gsap.to(el,{scale:1,duration:.2,delay:.3});
+    gsap.to(el,{y:-80,opacity:0,duration:.6,delay:1,ease:'power2.in',onComplete:()=>el.remove()});
+  }else{
+    setTimeout(()=>el.remove(),1500);
+    el.style.opacity='1';
+  }
+}
+
+// ═══ EVENT FEED (top ticker) ═══
+const EVENT_TEMPLATES=[
+  {t:'up',s:n=>`🚀 ${n} LANDED ON BITCOIN — BAGS SECURED +500`},
+  {t:'down',s:n=>`💀 ${n} GOT REKT ON 100x LONG -1200`},
+  {t:'special',s:n=>`🪂 ${n} PASSED AIRDROP +200 USDT`},
+  {t:'up',s:n=>`🟢 BTC +4.2% | PEPE +14.1% | DOGE +8.3%`},
+  {t:'down',s:n=>`🔴 FLASH CRASH | XRP -3.1% | TRUMP -12%`},
+  {t:'special',s:n=>`⚠️ SEC JUST TWEETED — MARKET PANIC`},
+  {t:'up',s:n=>`💰 ${n} FLIPPED UNISWAP — 2x RETURN`},
+  {t:'down',s:n=>`🏴‍☠️ PUMP.FUN RUG DETECTED — EXIT LIQUIDITY`},
+  {t:'special',s:n=>`🐋 WHALE ALERT: 10,000 BTC MOVED TO BINANCE`},
+  {t:'up',s:n=>`📈 ${n} BOUGHT SOLANA — PORTFOLIO +3.4%`},
+  {t:'special',s:n=>`🇺🇸 TRUMP SIGNED CRYPTO EXECUTIVE ORDER`},
+  {t:'up',s:n=>`🔑 ${n} GOT GET-OUT-OF-SEC CARD`},
+  {t:'down',s:n=>`⚖️ GENSLER'S GHOST HAUNTS ${n} — GO TO SEC`},
+  {t:'special',s:n=>`🍌 JUSTIN SUN BOUGHT ANOTHER $6.2M BANANA`},
+  {t:'up',s:n=>`4️⃣ CZ POSTED "4" — BINANCE PUMPING`},
+  {t:'down',s:n=>`💸 ${n} PAID 150 GAS FEE ON ETHEREUM`},
+];
+function getEventText(){
+  const tmpl=EVENT_TEMPLATES[Math.floor(Math.random()*EVENT_TEMPLATES.length)];
+  const playerName=(window.PLAYER&&window.PLAYER.name)?window.PLAYER.name.toUpperCase():'A DEGEN';
+  return{type:tmpl.t,text:tmpl.s(playerName)};
+}
+function renderEventFeed(){
+  const feed=document.getElementById('event-feed');
+  if(!feed)return;
+  let html='';
+  for(let i=0;i<20;i++){
+    const ev=getEventText();
+    const cls={up:'event-up',down:'event-down',special:'event-special',neutral:'event-neutral'}[ev.type];
+    html+=`<span class="${cls}">${ev.text}</span>`;
+  }
+  feed.innerHTML=html;
+}
+function pushEvent(text,type='neutral'){
+  const feed=document.getElementById('event-feed');
+  if(!feed)return;
+  const cls={up:'event-up',down:'event-down',special:'event-special',neutral:'event-neutral'}[type];
+  const span=document.createElement('span');
+  span.className=cls;
+  span.textContent=`★ ${text}`;
+  feed.prepend(span);
+  // keep only 30 items
+  while(feed.children.length>30)feed.lastChild.remove();
+}
+
+// ═══ K-LINE CANDLE BACKGROUND ═══
+function drawKline(){
+  const canvas=document.getElementById('kline-bg');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const w=canvas.width,h=canvas.height;
+  // generate random candle data
+  const candles=[];
+  const cw=12,gap=4,cols=Math.ceil(w/(cw+gap))+5;
+  let price=h*.5;
+  for(let i=0;i<cols;i++){
+    const open=price;
+    const change=(Math.random()-.48)*30;
+    const close=open+change;
+    const high=Math.min(open,close)-Math.random()*15;
+    const low=Math.max(open,close)+Math.random()*15;
+    candles.push({open,close,high,low});
+    price=close;
+    if(price<h*.2)price=h*.2+Math.random()*30;
+    if(price>h*.8)price=h*.8-Math.random()*30;
+  }
+  let offset=0;
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    candles.forEach((c,i)=>{
+      const x=i*(cw+gap)-offset;
+      if(x<-cw||x>w)return;
+      const up=c.close<c.open;
+      const col=up?'#0f0':'#f33';
+      ctx.strokeStyle=col;ctx.fillStyle=col;
+      ctx.globalAlpha=.6;
+      // wick
+      ctx.beginPath();ctx.moveTo(x+cw/2,c.high);ctx.lineTo(x+cw/2,c.low);ctx.stroke();
+      // body
+      const bodyTop=Math.min(c.open,c.close),bodyH=Math.abs(c.open-c.close)||1;
+      ctx.globalAlpha=.35;
+      ctx.fillRect(x,bodyTop,cw,bodyH);
+      ctx.globalAlpha=.8;
+      ctx.strokeRect(x,bodyTop,cw,bodyH);
+    });
+    offset+=.3;
+    if(offset>cw+gap){
+      offset=0;
+      candles.shift();
+      const last=candles[candles.length-1]||{close:h*.5};
+      const open=last.close;
+      const change=(Math.random()-.48)*30;
+      const close=open+change;
+      candles.push({open,close,high:Math.min(open,close)-Math.random()*15,low:Math.max(open,close)+Math.random()*15});
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+window.addEventListener('resize',()=>{
+  const c=document.getElementById('kline-bg');
+  if(c){c.width=window.innerWidth;c.height=window.innerHeight}
+});
 
 // === ROLL & WALK ===
 let isRolling=false;
@@ -808,6 +1021,7 @@ function rollAndWalk(){
 
 async function walkSteps(n){
   const dd=document.getElementById('dice-display');
+  const pname=(window.PLAYER&&window.PLAYER.name)?window.PLAYER.name.toUpperCase():'DEGEN';
   for(let i=0;i<n;i++){
     window.playerPos=(window.playerPos+1)%40;
     const pos=window.playerPos;
@@ -822,6 +1036,10 @@ async function walkSteps(n){
     // check pass GO
     if(pos===0&&i>0){
       dd.textContent=`✈️ AIRDROP! +200 USDT`;
+      if(window.PLAYER){window.PLAYER.money+=200;updateMoney()}
+      popup('+200 AIRDROP','up');
+      dingWin();
+      pushEvent(`${pname} PASSED AIRDROP +200 USDT`,'special');
       if(window.confetti){
         confetti({particleCount:100,spread:80,origin:{x:.5,y:.5},colors:['#14F195','#0FBA6E','#FFD700']});
       }
@@ -837,14 +1055,61 @@ async function walkSteps(n){
   jackpot();
   landBoom(window.playerPos);
   const sq=(window.SQ_DATA||[])[window.playerPos];
+  const mode=landedSq?landedSq.getAttribute('data-mode'):null;
   if(sq){
     let label=sq.n||'?';
-    if(landedSq&&landedSq.getAttribute('data-mode')==='pump')label='🚀 '+label+' PUMP!';
-    else if(landedSq&&landedSq.getAttribute('data-mode')==='dump')label='💀 '+label+' DUMP!';
-    else if(sq.n==='Bitcoin'||sq.n==='Ethereum')label='👑 '+label;
+    if(mode==='pump'){
+      label='🚀 '+label+' PUMP!';
+      dingWin();
+      popup('PUMP! +'+(sq.$||50),'up');
+      if(window.PLAYER){window.PLAYER.money+=sq.$||50;updateMoney()}
+      pushEvent(`${pname} HIT PUMP ON ${sq.n} +${sq.$||50}`,'up');
+    }else if(mode==='dump'){
+      label='💀 '+label+' DUMP!';
+      dingLose();
+      popup('REKT! -'+(sq.$||50),'down');
+      if(window.PLAYER){window.PLAYER.money-=sq.$||50;updateMoney()}
+      pushEvent(`${pname} GOT DUMPED ON ${sq.n} -${sq.$||50}`,'down');
+    }else if(sq.n==='Bitcoin'||sq.n==='Ethereum'){
+      label='👑 '+label;
+      dingWin();
+      popup('👑 '+sq.n+' 👑','gold');
+      pushEvent(`${pname} LANDED ON ${sq.n} — LEGENDARY`,'special');
+    }else if(sq.t==='tx'){
+      dingLose();
+      popup('TAX -'+(sq.n.includes('WHALE')?100:200),'down');
+      if(window.PLAYER){window.PLAYER.money-=(sq.n.includes('WHALE')?100:200);updateMoney()}
+      pushEvent(`${pname} PAID ${sq.n}`,'down');
+    }else if(sq.t==='jail'||sq.t==='gj'){
+      dingLose();
+      popup('SEC DETENTION','down');
+      pushEvent(`${pname} SENT TO SEC DETENTION`,'down');
+    }else if(sq.t==='go'){
+      dingWin();
+      popup('+200 AIRDROP','up');
+      if(window.PLAYER){window.PLAYER.money+=200;updateMoney()}
+      pushEvent(`${pname} LANDED ON AIRDROP +200`,'special');
+    }else if(sq.t==='wp'){
+      chaChing();
+      popup('WHITE PAPER','gold');
+      pushEvent(`${pname} DREW WHITE PAPER CARD`,'special');
+    }else if(sq.t==='al'){
+      chaChing();
+      popup('ALPHA LEAK','gold');
+      pushEvent(`${pname} DREW ALPHA CARD`,'special');
+    }else{
+      chaChing();
+      pushEvent(`${pname} LANDED ON ${sq.n}`,'neutral');
+    }
     dd.textContent='📍 '+label;
   }
   setTimeout(()=>{document.getElementById('roll-btn').disabled=false;isRolling=false},1600);
+}
+
+function updateMoney(){
+  if(!window.PLAYER)return;
+  const m=document.getElementById('pb-money');
+  if(m)m.textContent=window.PLAYER.money.toLocaleString()+' USDT';
 }
 
 // === IDLE CASINO MARQUEE CHASE ===

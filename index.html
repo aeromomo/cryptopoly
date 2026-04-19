@@ -31,29 +31,76 @@ body{background:var(--bg);color:#d0d8e8;font-family:'Inter',sans-serif;overflow-
 .board-wrap{display:flex;justify-content:center;padding:10px 20px 20px}
 .board{display:grid;grid-template-columns:1.6fr repeat(9,1fr) 1.6fr;grid-template-rows:1.6fr repeat(9,1fr) 1.6fr;width:min(95vmin,1100px);aspect-ratio:1;border:2px solid rgba(247,147,26,.2);border-radius:8px;background:rgba(6,10,18,.72);box-shadow:0 0 120px rgba(247,147,26,.08),0 0 40px rgba(0,0,0,.6);overflow:hidden;backdrop-filter:blur(8px)}
 
-.c{border:1px solid rgba(255,255,255,.035);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2px;position:relative;overflow:hidden}
-.c:hover{background:rgba(255,255,255,.03)}
-.c .lg{width:clamp(26px,4.2vmin,50px);height:clamp(26px,4.2vmin,50px);border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:2}
-.c .lg img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 8px rgba(255,255,255,.15))}
-.c .lg .fb{font-size:clamp(14px,2.2vmin,26px)}
-.c .bg-glow{position:absolute;inset:-10px;z-index:0;opacity:.1;filter:blur(10px) saturate(2)}
-.c .bg-glow img{width:120%;height:120%;object-fit:contain}
-.c .nm{font-family:'Orbitron';font-weight:700;font-size:clamp(5px,.76vmin,9.5px);color:#fff;line-height:1.1;letter-spacing:.4px;z-index:2;text-shadow:0 0 10px rgba(0,0,0,.8)}
-.c .pr{font-family:'JetBrains Mono';font-size:clamp(4.5px,.58vmin,7.5px);color:rgba(255,255,255,.3);z-index:2}
+/* ── branded cell ── */
+.c{border:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.c.prop,.c.wcell,.c.ucell{
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 35%, var(--b1,#888)33 0%, var(--b1,#888)0d 45%, rgba(8,12,20,.92) 100%),
+    linear-gradient(135deg, var(--b2,#555)14 0%, rgba(5,8,14,.85) 100%);
+  border:1px solid color-mix(in srgb, var(--b1,#888) 35%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.06),
+    inset 0 0 28px color-mix(in srgb, var(--b1,#888) 12%, transparent),
+    0 0 12px color-mix(in srgb, var(--b1,#888) 18%, transparent);
+}
+.c.prop::before,.c.wcell::before,.c.ucell::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg, transparent 30%, rgba(255,255,255,.06) 50%, transparent 70%);
+  pointer-events:none;z-index:1;
+}
+.c:hover{transform:scale(1.04);z-index:10;box-shadow:
+  inset 0 1px 0 rgba(255,255,255,.08),
+  inset 0 0 32px color-mix(in srgb, var(--b1,#888) 18%, transparent),
+  0 0 24px color-mix(in srgb, var(--b1,#888) 35%, transparent)}
 
-.c .bar{position:absolute;z-index:1}
-.c[data-s="t"] .bar{bottom:0;left:0;right:0;height:6px;box-shadow:0 0 14px 2px var(--bc)}
-.c[data-s="b"] .bar{top:0;left:0;right:0;height:6px;box-shadow:0 0 14px 2px var(--bc)}
-.c[data-s="l"] .bar{top:0;bottom:0;right:0;width:6px;box-shadow:0 0 14px 2px var(--bc)}
-.c[data-s="r"] .bar{top:0;bottom:0;left:0;width:6px;box-shadow:0 0 14px 2px var(--bc)}
+.c .lg{width:clamp(36px,6.2vmin,72px);height:clamp(36px,6.2vmin,72px);border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:3;background:radial-gradient(circle, rgba(255,255,255,.08) 0%, transparent 70%);padding:2px}
+.c .lg img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px color-mix(in srgb, var(--b1,#fff) 55%, transparent)) drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+.c .lg .fb{font-size:clamp(18px,3vmin,32px);line-height:1;filter:drop-shadow(0 0 8px var(--b1,#fff))}
+.c .nm{font-family:'Orbitron';font-weight:800;font-size:clamp(5.5px,.85vmin,10.5px);color:#fff;line-height:1.1;letter-spacing:.5px;z-index:3;text-shadow:0 1px 3px rgba(0,0,0,.9),0 0 10px color-mix(in srgb, var(--b1,#fff) 30%, transparent);margin-top:2px}
+.c .pr{font-family:'JetBrains Mono';font-size:clamp(5px,.65vmin,8px);color:rgba(255,255,255,.45);z-index:3;text-shadow:0 1px 2px rgba(0,0,0,.8)}
 
-.c.corner{background:radial-gradient(ellipse at center,rgba(18,26,42,.8),rgba(6,10,18,.9))}
-.c.corner .nm{font-family:'Orbitron';font-size:clamp(5.5px,.85vmin,11px);letter-spacing:.8px}
-.c.corner .sub{font-size:clamp(4px,.48vmin,6.5px);color:rgba(255,255,255,.18)}
-.c.corner .ic{font-size:clamp(18px,3.2vmin,36px);filter:drop-shadow(0 0 10px rgba(255,255,255,.15))}
-.c.cwp{background:linear-gradient(135deg,rgba(56,132,244,.1),rgba(56,132,244,.02))}
-.c.cal{background:linear-gradient(135deg,rgba(239,83,80,.1),rgba(239,83,80,.02))}
-.c.ctx{background:linear-gradient(135deg,rgba(247,147,26,.08),rgba(247,147,26,.02))}
+.c .bar{position:absolute;z-index:2}
+.c[data-s="t"] .bar{bottom:0;left:0;right:0;height:5px;box-shadow:0 0 16px 3px var(--b1,#888)}
+.c[data-s="b"] .bar{top:0;left:0;right:0;height:5px;box-shadow:0 0 16px 3px var(--b1,#888)}
+.c[data-s="l"] .bar{top:0;bottom:0;right:0;width:5px;box-shadow:0 0 16px 3px var(--b1,#888)}
+.c[data-s="r"] .bar{top:0;bottom:0;left:0;width:5px;box-shadow:0 0 16px 3px var(--b1,#888)}
+
+/* corners get brand treatment too */
+.c.corner{
+  background:
+    radial-gradient(ellipse at center, var(--b1,#263238)33 0%, rgba(8,12,20,.95) 70%),
+    linear-gradient(135deg, var(--b2,#37474f)1a 0%, rgba(3,5,8,.95) 100%);
+  border:2px solid color-mix(in srgb, var(--b1,#263238) 40%, transparent);
+  box-shadow:
+    inset 0 0 30px color-mix(in srgb, var(--b1,#263238) 15%, transparent),
+    0 0 18px color-mix(in srgb, var(--b1,#263238) 25%, transparent);
+}
+.c.corner .nm{font-family:'Orbitron';font-size:clamp(6px,.95vmin,12px);letter-spacing:1px;color:var(--b1,#fff);text-shadow:0 0 10px color-mix(in srgb, var(--b1,#fff) 60%, transparent),0 2px 3px rgba(0,0,0,.9);font-weight:900;z-index:3}
+.c.corner .sub{font-size:clamp(4px,.52vmin,7px);color:rgba(255,255,255,.4);line-height:1.2;z-index:3}
+.c.corner .ic{font-size:clamp(22px,3.8vmin,44px);filter:drop-shadow(0 0 12px var(--b1,#fff)) drop-shadow(0 2px 4px rgba(0,0,0,.5));z-index:3}
+
+/* card cells - holographic */
+.c.cwp{
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(56,132,244,.28) 0%, rgba(56,132,244,.04) 60%, rgba(6,10,18,.95) 100%),
+    linear-gradient(135deg, rgba(98,126,234,.08) 0%, rgba(5,8,14,.95) 100%);
+  border:1px solid rgba(56,132,244,.4);
+  box-shadow:inset 0 0 30px rgba(56,132,244,.12),0 0 15px rgba(56,132,244,.2);
+}
+.c.cal{
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(239,83,80,.28) 0%, rgba(239,83,80,.04) 60%, rgba(6,10,18,.95) 100%),
+    linear-gradient(135deg, rgba(239,83,80,.08) 0%, rgba(5,8,14,.95) 100%);
+  border:1px solid rgba(239,83,80,.4);
+  box-shadow:inset 0 0 30px rgba(239,83,80,.12),0 0 15px rgba(239,83,80,.2);
+}
+.c.ctx{
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(255,152,0,.28) 0%, rgba(255,152,0,.04) 60%, rgba(6,10,18,.95) 100%),
+    linear-gradient(135deg, rgba(255,111,0,.08) 0%, rgba(5,8,14,.95) 100%);
+  border:1px solid rgba(255,152,0,.4);
+  box-shadow:inset 0 0 30px rgba(255,152,0,.12),0 0 15px rgba(255,152,0,.2);
+}
 
 .center{grid-column:2/11;grid-row:2/11;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(10,16,26,.9),rgba(3,5,8,.96));border:1px solid rgba(255,255,255,.02);position:relative;overflow:hidden}
 .center::before{content:'';position:absolute;width:150%;height:150%;background:conic-gradient(from 0deg,transparent,rgba(247,147,26,.025),transparent,rgba(98,126,234,.025),transparent);animation:cs 40s linear infinite}
@@ -144,6 +191,22 @@ const LOGOS={'DOGE':L('dogecoin'),'PEPE':L('pepe'),'Bitcoin':L('bitcoin'),'Ether
 const FB={'DOGE':'🐕','PEPE':'🐸','TRUMP':'🏛','TRON':'⚡','XRP':'✕','Bitcoin':'₿','Ethereum':'⟠','Solana':'◎','BNB Chain':'◆','Sui':'💧','Arbitrum':'🔷','Optimism':'🔴','Base':'🔵','Uniswap':'🦄','Aave':'👻','MakerDAO':'Ⓜ','Kraken':'🐙','Bitget':'▲','Coinbase':'◉','Bybit':'▶','OKX':'⊕','Binance':'◆','MetaMask':'🦊','Phantom':'👻','Trust Wallet':'🛡','Ledger':'🔒','Gas Station':'⛽','MEV Bot':'🤖'};
 const GC={brown:'#8B5E3C',lightblue:'#29B6F6',pink:'#EC407A',orange:'#FF9800',red:'#EF5350',yellow:'#FFD600',green:'#66BB6A',darkblue:'#1E88E5',wallet:'#546E7A',utility:'#AB47BC'};
 const LC={brown:50,lightblue:50,pink:100,orange:100,red:150,yellow:150,green:200,darkblue:200};
+// Canonical brand colors [primary, secondary] per entity
+const BRAND={
+  'Bitcoin':['#F7931A','#FFB84D'],'Ethereum':['#627EEA','#8247E5'],
+  'DOGE':['#C2A633','#E5C74A'],'PEPE':['#3D8130','#4E9741'],'TRUMP':['#E11D48','#1E3A8A'],
+  'TRON':['#FF060A','#CC000F'],'XRP':['#00AAE4','#23292F'],
+  'Solana':['#9945FF','#14F195'],'BNB Chain':['#F3BA2F','#FFD040'],'Sui':['#4DA2FF','#6FB7FF'],
+  'Arbitrum':['#28A0F0','#1E7AC7'],'Optimism':['#FF0420','#FF4050'],'Base':['#0052FF','#4A8FFF'],
+  'Uniswap':['#FF007A','#FF5BA6'],'Aave':['#B6509E','#2EBAC6'],'MakerDAO':['#1AAB9B','#F4B731'],
+  'Kraken':['#5741D9','#7132F5'],'Bitget':['#00F0FF','#00B4BF'],'Coinbase':['#0052FF','#4A8FFF'],
+  'Bybit':['#F7A600','#FFD040'],'OKX':['#FFFFFF','#9E9E9E'],'Binance':['#F0B90B','#FFD040'],
+  'MetaMask':['#F6851B','#E2761B'],'Phantom':['#AB9FF2','#534BB1'],
+  'Trust Wallet':['#3375BB','#48ADEF'],'Ledger':['#BDBDBD','#FFFFFF'],
+  'Gas Station':['#FF6F00','#FFA040'],'MEV Bot':['#9C27B0','#C154DE'],
+  'AIRDROP':['#14F195','#0FBA6E'],'SEC':['#78909C','#455A64'],
+  'HODL':['#42A5F5','#1E88E5'],'CFTC':['#EF5350','#C62828'],
+};
 const SQ=[
 {id:0,t:'go',n:'AIRDROP',ic:'✈️',d:'COLLECT 200 USDT'},{id:1,t:'p',n:'PEPE',g:'brown',$:60,r:[2,10,30,90,160,250]},{id:2,t:'wp'},{id:3,t:'p',n:'TRUMP',g:'brown',$:60,r:[4,20,60,180,320,450]},{id:4,t:'tx',n:'GAS FEE',ic:'⛽',d:'PAY 200'},{id:5,t:'w',n:'MetaMask',$:200},{id:6,t:'p',n:'Optimism',g:'lightblue',$:100,r:[6,30,90,270,400,550]},{id:7,t:'al'},{id:8,t:'p',n:'Arbitrum',g:'lightblue',$:100,r:[6,30,90,270,400,550]},{id:9,t:'p',n:'Base',g:'lightblue',$:120,r:[8,40,100,300,450,600]},{id:10,t:'jail',n:'SEC',ic:'🏛',d:'DETENTION'},{id:11,t:'p',n:'MakerDAO',g:'pink',$:140,r:[10,50,150,450,625,750]},{id:12,t:'u',n:'Gas Station',$:150},{id:13,t:'p',n:'Aave',g:'pink',$:140,r:[10,50,150,450,625,750]},{id:14,t:'p',n:'Uniswap',g:'pink',$:160,r:[12,60,180,500,700,900]},{id:15,t:'w',n:'Phantom',$:200},{id:16,t:'p',n:'Sui',g:'orange',$:180,r:[14,70,200,550,750,950]},{id:17,t:'wp'},{id:18,t:'p',n:'TRON',g:'orange',$:180,r:[14,70,200,550,750,950]},{id:19,t:'p',n:'DOGE',g:'orange',$:200,r:[16,80,220,600,800,1000]},{id:20,t:'pk',n:'HODL',ic:'💎',d:'LOUNGE'},{id:21,t:'p',n:'Kraken',g:'red',$:220,r:[18,90,250,700,875,1050]},{id:22,t:'al'},{id:23,t:'p',n:'Bitget',g:'red',$:220,r:[18,90,250,700,875,1050]},{id:24,t:'p',n:'Coinbase',g:'red',$:240,r:[20,100,300,750,925,1100]},{id:25,t:'w',n:'Trust Wallet',$:200},{id:26,t:'p',n:'Bybit',g:'yellow',$:260,r:[22,110,330,800,975,1150]},{id:27,t:'p',n:'OKX',g:'yellow',$:260,r:[22,110,330,800,975,1150]},{id:28,t:'u',n:'MEV Bot',$:150},{id:29,t:'p',n:'Binance',g:'yellow',$:280,r:[24,120,360,850,1025,1200]},{id:30,t:'gj',n:'CFTC',ic:'🚨',d:'ENFORCEMENT'},{id:31,t:'p',n:'Solana',g:'green',$:300,r:[26,130,390,900,1100,1275]},{id:32,t:'p',n:'BNB Chain',g:'green',$:300,r:[26,130,390,900,1100,1275]},{id:33,t:'wp'},{id:34,t:'p',n:'XRP',g:'green',$:320,r:[28,150,450,1000,1200,1400]},{id:35,t:'w',n:'Ledger',$:200},{id:36,t:'al'},{id:37,t:'p',n:'Ethereum',g:'darkblue',$:350,r:[35,175,500,1100,1300,1500]},{id:38,t:'tx',n:'WHALE TAX',ic:'🐋',d:'PAY 100'},{id:39,t:'p',n:'Bitcoin',g:'darkblue',$:400,r:[50,200,600,1400,1700,2000]}
 ];
@@ -157,9 +220,8 @@ const ALC=[{i:'🐕',t:'Elon tweeted DOGE to the moon! Advance to DOGE'},{i:'�
 
 function mkL(name){
   const url=LOGOS[name],fb=FB[name]||'?';
-  let bg=url?`<div class="bg-glow"><img src="${url}" onerror="this.parentElement.style.display='none'"></div>`:'';
-  let lg=url?`<div class="lg"><img src="${url}" onerror="this.parentElement.innerHTML='<span class=fb>${fb}</span>'"></div>`:`<div class="lg"><span class="fb">${fb}</span></div>`;
-  return bg+lg;
+  if(url)return `<div class="lg"><img src="${url}" onerror="this.parentElement.innerHTML='<span class=fb>${fb}</span>'"></div>`;
+  return `<div class="lg"><span class="fb">${fb}</span></div>`;
 }
 
 (function(){
@@ -168,11 +230,14 @@ function mkL(name){
   SQ.forEach(sq=>{
     const[r,c]=GP[sq.id];const s=r===1?'t':r===11?'b':c===1?'l':c===11?'r':'';
     const e=document.createElement('div');e.className='c';e.style.gridRow=r;e.style.gridColumn=c;e.setAttribute('data-s',s);let h='';
+    // apply brand theme
+    const brand=BRAND[sq.n]||[GC[sq.g]||'#888','#555'];
+    e.style.setProperty('--b1',brand[0]);e.style.setProperty('--b2',brand[1]);
     switch(sq.t){
       case'go':case'jail':case'pk':case'gj':e.classList.add('corner');h=`<span class="ic">${sq.ic}</span><span class="nm">${sq.n}</span><span class="sub">${sq.d||''}</span>`;break;
-      case'p':e.style.setProperty('--bc',GC[sq.g]);h=`<div class="bar" style="background:${GC[sq.g]}"></div>${mkL(sq.n)}<span class="nm">${sq.n}</span><span class="pr">${sq.$}</span>`;break;
-      case'w':e.style.setProperty('--bc',GC.wallet);h=`<div class="bar" style="background:${GC.wallet}"></div>${mkL(sq.n)}<span class="nm">${sq.n}</span><span class="pr">${sq.$}</span>`;break;
-      case'u':e.style.setProperty('--bc',GC.utility);h=`<div class="bar" style="background:${GC.utility}"></div>${mkL(sq.n)}<span class="nm">${sq.n}</span><span class="pr">${sq.$}</span>`;break;
+      case'p':e.classList.add('prop');h=`<div class="bar" style="background:linear-gradient(90deg,${brand[0]},${brand[1]})"></div>${mkL(sq.n)}<span class="nm">${sq.n}</span><span class="pr">${sq.$}</span>`;break;
+      case'w':e.classList.add('wcell');h=`<div class="bar" style="background:linear-gradient(90deg,${brand[0]},${brand[1]})"></div>${mkL(sq.n)}<span class="nm">${sq.n}</span><span class="pr">${sq.$}</span>`;break;
+      case'u':e.classList.add('ucell');h=`<div class="bar" style="background:linear-gradient(90deg,${brand[0]},${brand[1]})"></div>${mkL(sq.n)}<span class="nm">${sq.n}</span><span class="pr">${sq.$}</span>`;break;
       case'wp':e.classList.add('cwp');h=`<span class="ic" style="font-size:clamp(16px,2.8vmin,28px)">📄</span><span class="nm" style="color:#3884f4">WHITE<br>PAPER</span>`;break;
       case'al':e.classList.add('cal');h=`<span class="ic" style="font-size:clamp(16px,2.8vmin,28px)">🎲</span><span class="nm" style="color:#ef5350">ALPHA</span>`;break;
       case'tx':e.classList.add('ctx');h=`<span class="ic" style="font-size:clamp(16px,2.8vmin,28px)">${sq.ic}</span><span class="nm">${sq.n}</span><span class="pr" style="color:#FF9800">${sq.d}</span>`;break;

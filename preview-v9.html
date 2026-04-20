@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CRYPTOPOLY v9 — K-line Native</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#000509;
+  --cyan:#00D9FF;
+  --pink:#FF0080;
+  --yellow:#FFFF00;
+  --green:#14F195;
+  --red:#FF3355;
+  --gold:#FFD700;
+  --text:#E8F0FF;
+  --text-dim:#6E7A95;
+  --glass:rgba(4,8,14,0.72);
+  --glass-brd:rgba(0,217,255,.22);
+}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow:hidden}
+
+/* ═══════ K-LINE: DOMINANT ═══════ */
+canvas#kline{position:fixed;inset:0;z-index:0;opacity:.62}
+
+/* glow layer */
+body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(ellipse 50% 50% at 10% 20%,rgba(255,0,128,.12),transparent),
+    radial-gradient(ellipse 50% 50% at 90% 80%,rgba(0,217,255,.12),transparent),
+    radial-gradient(ellipse 40% 40% at 50% 50%,rgba(255,215,0,.06),transparent)}
+
+/* subtle grid */
+body::after{content:'';position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.4;
+  background-image:linear-gradient(rgba(0,217,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,0,128,.04) 1px,transparent 1px);
+  background-size:60px 60px}
+
+/* ═══════ TOP LIVE BAR (compact, 32px) ═══════ */
+.top-bar{position:fixed;top:0;left:0;right:0;height:32px;z-index:100;background:rgba(0,5,10,.95);border-bottom:1px solid var(--pink);display:flex;align-items:center;padding:0 14px;font-family:'Space Mono';font-size:11px;font-weight:700;overflow:hidden;backdrop-filter:blur(8px)}
+.top-bar .brand{font-family:'Bebas Neue';font-size:18px;letter-spacing:6px;background:linear-gradient(90deg,var(--cyan),var(--pink),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:24px;flex-shrink:0;text-shadow:0 0 10px rgba(0,217,255,.3)}
+.top-bar .pulse-compact{display:flex;align-items:center;gap:8px;margin-right:24px;flex-shrink:0}
+.top-bar .pulse-compact .mini-bar{width:100px;height:6px;background:rgba(20,20,30,.8);border-radius:3px;overflow:hidden;display:flex}
+.top-bar .pulse-compact .r-seg{flex:35;background:linear-gradient(90deg,transparent,var(--red))}
+.top-bar .pulse-compact .g-seg{flex:65;background:linear-gradient(90deg,var(--green),transparent)}
+.top-bar .pulse-compact .val{color:var(--green);text-shadow:0 0 6px var(--green);min-width:40px}
+.top-bar .feed{overflow:hidden;flex:1}
+.top-bar .feed-track{display:inline-flex;gap:36px;white-space:nowrap;animation:scroll 55s linear infinite;padding-left:100%}
+@keyframes scroll{to{transform:translateX(-100%)}}
+.up{color:var(--green);text-shadow:0 0 6px var(--green)}
+.down{color:var(--red);text-shadow:0 0 6px var(--red)}
+.gold{color:var(--gold);text-shadow:0 0 6px var(--gold)}
+
+/* ═══════ MAIN GRID ═══════ */
+.app{position:fixed;top:32px;bottom:0;left:0;right:0;display:grid;grid-template-columns:210px 1fr 220px;grid-template-rows:1fr;gap:5px;padding:5px;z-index:10}
+
+/* ═══════ LEFT: CHAT (compact) ═══════ */
+.chat-pane{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--glass-brd);border-radius:8px;display:flex;flex-direction:column;overflow:hidden}
+.pane-h{padding:7px 10px;border-bottom:1px solid rgba(0,217,255,.15);display:flex;justify-content:space-between;align-items:center;font-family:'Bebas Neue';font-size:11px;letter-spacing:3px;color:var(--cyan);text-shadow:0 0 6px var(--cyan);flex-shrink:0}
+.pane-h .tag{font-family:'Space Mono';font-size:8px;padding:1px 5px;background:rgba(0,217,255,.15);border:1px solid var(--cyan);border-radius:2px;letter-spacing:1px}
+.chat-msgs{flex:1;overflow-y:auto;padding:6px 8px;display:flex;flex-direction:column;gap:4px;font-size:10.5px;font-family:'Space Mono'}
+.msg{display:flex;flex-direction:column;gap:1px;line-height:1.3}
+.msg .nm{font-family:'Bebas Neue';font-size:11px;letter-spacing:1px;color:var(--aura)}
+.msg .tx{color:#d8e0ec;padding-left:6px;border-left:2px solid var(--aura);margin-left:1px}
+.msg.trump{--aura:var(--gold)}
+.msg.elon{--aura:var(--cyan)}
+.msg.cz{--aura:#F3BA2F}
+.msg.vitalik{--aura:#9945FF}
+.msg.sys{--aura:var(--pink)}
+.msg.sys .tx{color:var(--pink);font-style:italic;font-size:10px;text-shadow:0 0 3px var(--pink)}
+.msg.skill{--aura:var(--gold);background:linear-gradient(90deg,rgba(255,215,0,.15),transparent);padding:3px 5px;border-radius:3px;margin:1px 0}
+.msg.skill .tx{color:var(--gold);font-weight:700;text-shadow:0 0 4px var(--gold)}
+.chat-input{padding:5px;border-top:1px solid rgba(0,217,255,.15);background:rgba(0,0,0,.3);flex-shrink:0}
+.chat-input input{width:100%;background:rgba(0,0,0,.6);border:1px solid rgba(255,0,128,.25);color:#fff;padding:5px 8px;font-family:'Space Mono';font-size:10px;border-radius:3px;outline:none}
+.chat-input input:focus{border-color:var(--pink);box-shadow:0 0 6px rgba(255,0,128,.3)}
+
+/* ═══════ CENTER: BOARD + LIVE EVENT STAGE ═══════ */
+.center-pane{display:flex;flex-direction:column;gap:5px;overflow:hidden;align-items:center;justify-content:center}
+
+/* Board */
+.board{display:grid;grid-template-columns:1.5fr repeat(9,1fr) 1.5fr;grid-template-rows:1.5fr repeat(9,1fr) 1.5fr;
+  width:min(90vh,920px);height:min(90vh,920px);max-width:100%;gap:3px;padding:6px;
+  background:rgba(2,4,8,.75);backdrop-filter:blur(12px);border:2px solid var(--glass-brd);border-radius:10px;
+  box-shadow:0 0 30px rgba(0,217,255,.15),0 0 60px rgba(255,0,128,.06),inset 0 0 40px rgba(0,0,0,.6);
+  position:relative}
+
+.c{background:rgba(6,10,18,.75);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.05);border-radius:5px;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:3px 2px 10px;
+  position:relative;overflow:hidden;transition:all .15s;min-width:0;min-height:0}
+.c:hover{transform:translateY(-2px) scale(1.05);z-index:30;border-color:var(--brand,var(--cyan));box-shadow:0 0 16px var(--brand,var(--cyan))}
+.c .top-stripe{position:absolute;top:0;left:0;right:0;height:2.5px;background:var(--brand);box-shadow:0 0 5px var(--brand),0 0 2px var(--brand)}
+.c .lg{width:clamp(16px,2.8vh,34px);height:clamp(16px,2.8vh,34px);border-radius:50%;overflow:hidden;padding:2px;background:rgba(255,255,255,.04);flex-shrink:0;margin-top:3px;z-index:2;border:1px solid var(--brand)}
+.c .lg img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 4px var(--brand))}
+.c .nm{font-family:'Bebas Neue';font-size:clamp(6px,1vh,11px);color:#fff;line-height:1;letter-spacing:.3px;text-shadow:0 0 5px var(--brand);z-index:2;text-align:center;margin:1px 0}
+.c .pr{font-family:'Space Mono';font-size:clamp(5px,.7vh,8px);color:var(--yellow);font-weight:700;z-index:2;line-height:1}
+
+/* BIGGER mini chart (occupies bottom 30% of cell) */
+.c .mini{position:absolute;bottom:1px;left:2px;right:2px;height:10px;opacity:.85;z-index:1}
+.c .mini svg{width:100%;height:100%}
+
+.c .own-dot{position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;border:1px solid #000;z-index:3;box-shadow:0 0 5px currentColor}
+.c .lev-pill{position:absolute;top:2px;left:2px;background:var(--yellow);color:#000;font-family:'Bebas Neue';font-size:7px;padding:0 3px;border-radius:2px;font-weight:900;z-index:3;line-height:1.3}
+
+/* tier colors */
+.c[data-tier="brown"]{--brand:#B8864D}
+.c[data-tier="lightblue"]{--brand:#29B6F6}
+.c[data-tier="pink"]{--brand:#EC407A}
+.c[data-tier="orange"]{--brand:#FF9800}
+.c[data-tier="red"]{--brand:#EF5350}
+.c[data-tier="yellow"]{--brand:#FFD600}
+.c[data-tier="green"]{--brand:#66BB6A}
+.c[data-tier="darkblue"]{--brand:var(--cyan)}
+.c[data-tier="infra"]{--brand:var(--pink)}
+.c[data-tier="utility"]{--brand:#AB47BC}
+
+.c.corner{background:radial-gradient(ellipse at center,rgba(30,40,60,.7),rgba(4,8,14,.9));border:1px solid var(--cyan);justify-content:center;padding:5px 3px}
+.c.corner .ic{font-size:clamp(16px,2.5vh,28px);filter:drop-shadow(0 0 10px var(--cyan));margin-bottom:2px}
+.c.corner .nm{font-family:'Bebas Neue';font-size:clamp(7px,1vh,11px);letter-spacing:1px;color:var(--cyan);text-shadow:0 0 8px var(--cyan)}
+.c.corner .sub{font-size:clamp(5px,.6vh,7.5px);color:#aaa;letter-spacing:.5px}
+
+.c.cwp{background:rgba(0,60,180,.15);border-color:var(--cyan)}
+.c.cal{background:rgba(180,0,80,.15);border-color:var(--pink)}
+.c.ctx{background:rgba(200,120,0,.15);border-color:#FF9800}
+
+/* CENTER (inside board): Live Drama Stage */
+.stage{grid-column:2/11;grid-row:2/11;position:relative;overflow:hidden;background:radial-gradient(ellipse at center,rgba(8,14,28,.35),rgba(0,0,0,.65));border-radius:6px;display:flex;flex-direction:column;align-items:center;padding:12px 8px}
+
+.stage::before{content:'';position:absolute;width:250%;height:250%;left:-75%;top:-75%;
+  background:conic-gradient(from 0deg,transparent,rgba(0,217,255,.05),transparent,rgba(255,0,128,.05),transparent);
+  animation:spin 50s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 5 titans positioned around center */
+.jojo{position:absolute;width:clamp(44px,7vh,78px);height:clamp(44px,7vh,78px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:clamp(18px,3vh,34px);font-weight:900;color:#fff;z-index:2;border:3px solid var(--aura);box-shadow:0 0 18px var(--aura),inset 0 0 15px rgba(0,0,0,.4);background:radial-gradient(circle,rgba(0,0,0,.6),rgba(0,0,0,.9))}
+.jojo::before{content:'';position:absolute;inset:-16%;border-radius:50%;background:conic-gradient(from 0deg,var(--aura),transparent 50%,var(--aura));filter:blur(10px);z-index:-1;animation:spin 6s linear infinite;opacity:.55}
+.jojo::after{content:attr(data-char);text-shadow:0 0 10px var(--aura);letter-spacing:1px}
+.jojo.trump{--aura:var(--gold);top:5%;left:5%}
+.jojo.elon{--aura:var(--cyan);top:5%;right:5%}
+.jojo.cz{--aura:#F3BA2F;bottom:5%;left:5%}
+.jojo.vitalik{--aura:#9945FF;bottom:5%;right:5%}
+.jojo.satoshi{--aura:var(--pink);top:50%;left:50%;transform:translate(-50%,-50%);font-size:clamp(14px,2.4vh,24px)}
+
+/* BIG center title */
+.center-title{font-family:'Bebas Neue';font-size:clamp(28px,5.5vh,60px);letter-spacing:10px;color:#fff;line-height:1;
+  background:linear-gradient(90deg,var(--cyan),var(--pink),var(--yellow),var(--cyan));background-size:300% 300%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradientShift 5s ease infinite;
+  filter:drop-shadow(0 0 20px rgba(0,217,255,.4));margin-top:14px;z-index:3;text-align:center}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.center-sub{font-family:'Space Mono';font-size:11px;color:#888;letter-spacing:4px;margin-top:3px;z-index:3}
+
+/* LIVE DRAMA: what just happened */
+.drama-box{background:rgba(0,0,0,.55);border:1px solid var(--gold);border-radius:8px;padding:10px 14px;margin-top:auto;margin-bottom:14px;width:85%;max-width:420px;z-index:3;backdrop-filter:blur(10px);box-shadow:0 0 20px rgba(255,215,0,.2)}
+.drama-box .dbh{font-family:'Bebas Neue';font-size:11px;letter-spacing:3px;color:var(--gold);text-shadow:0 0 8px var(--gold);margin-bottom:6px;text-align:center;opacity:.9}
+.drama-event{display:flex;align-items:center;gap:8px;padding:5px 6px;font-family:'Space Mono';font-size:12px;line-height:1.3;border-left:3px solid var(--drama-c,var(--gold));margin-bottom:3px;background:rgba(0,0,0,.35);border-radius:3px}
+.drama-event.rekt{--drama-c:var(--red)}
+.drama-event.moon{--drama-c:var(--green)}
+.drama-event.news{--drama-c:var(--gold)}
+.drama-event .ic{font-size:17px;filter:drop-shadow(0 0 4px var(--drama-c))}
+.drama-event .txt{flex:1;color:#f0f0f0}
+.drama-event .txt b{color:var(--drama-c);text-shadow:0 0 4px var(--drama-c)}
+.drama-event .time{font-size:9px;color:#666}
+
+/* decks */
+.decks{display:flex;gap:12px;margin-bottom:8px;z-index:3}
+.dk{width:50px;height:66px;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-family:'Bebas Neue';font-size:9px;letter-spacing:1px;border:2px solid;backdrop-filter:blur(6px)}
+.dk.wp{border-color:var(--cyan);color:var(--cyan);background:rgba(0,217,255,.1);box-shadow:0 0 10px rgba(0,217,255,.35)}
+.dk.al{border-color:var(--pink);color:var(--pink);background:rgba(255,0,128,.1);box-shadow:0 0 10px rgba(255,0,128,.35)}
+
+/* ═══════ RIGHT: WALLET + KILL FEED + ACTIONS stack ═══════ */
+.right-pane{display:flex;flex-direction:column;gap:5px;overflow:hidden}
+.wallet-pane,.kf-pane,.skill-pane,.action-pane{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--glass-brd);border-radius:8px;display:flex;flex-direction:column;overflow:hidden}
+.wallet-pane{flex:1.7}
+.skill-pane{flex:1}
+.kf-pane{flex:1.1}
+.action-pane{flex:1.4}
+
+.wallet-pane .content{padding:7px 8px;display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+.w-row{display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto 8px;gap:2px 7px;align-items:center}
+.w-row .avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:14px;color:#fff;border:1.5px solid var(--aura);box-shadow:0 0 8px var(--aura);grid-row:1/3;background:radial-gradient(circle,var(--aura)44,rgba(0,0,0,.8));text-shadow:0 0 4px var(--aura)}
+.w-row .lbl{display:flex;justify-content:space-between;align-items:baseline;gap:4px;font-family:'Bebas Neue';font-size:12px;letter-spacing:1px;color:var(--aura);text-shadow:0 0 5px var(--aura)}
+.w-row .lbl .amt{font-family:'Space Mono';font-size:10px;color:var(--green);text-shadow:0 0 4px var(--green);font-weight:700}
+.w-row.rekt .amt{color:var(--red);text-shadow:0 0 4px var(--red)}
+.w-row .bar{height:7px;background:rgba(20,241,149,.1);border-radius:3px;overflow:hidden;position:relative}
+.w-row .fill{height:100%;background:linear-gradient(90deg,var(--green),#0FBA6E);box-shadow:0 0 8px var(--green);border-radius:3px;transition:width .5s}
+.w-row.rekt .fill{background:var(--red);box-shadow:0 0 6px var(--red)}
+.w-row.rekt .avatar{filter:grayscale(.6) brightness(.6)}
+.w-row.rekt .lbl>span:first-child{text-decoration:line-through;color:var(--red)}
+.w-row.active{position:relative}
+.w-row.active .lbl::before{content:'▶';color:var(--yellow);animation:blink 1s infinite;font-size:10px}
+@keyframes blink{0%,60%,100%{opacity:1}70%,80%{opacity:.3}}
+
+.kf-pane .content{padding:5px 7px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;font-family:'Space Mono';font-size:9.5px;line-height:1.3}
+.kf-row{display:flex;gap:4px;align-items:center;padding:4px 5px;background:rgba(0,0,0,.5);border-left:2px solid var(--kf-c,var(--red));border-radius:2px}
+.kf-row .k{color:var(--green)}
+.kf-row .w{color:var(--gold);font-weight:700;font-size:11px}
+.kf-row .v{color:#888;flex:1;text-align:right}
+.kf-row.hack{--kf-c:var(--pink)}
+.kf-row.bear{--kf-c:var(--red)}
+
+.skill-pane .content{padding:8px 10px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,0,128,.05))}
+.skill-pane .content::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,.06) 50%,transparent 70%);animation:foil 4s infinite}
+@keyframes foil{0%,100%{transform:translateX(-30%)}50%{transform:translateX(30%)}}
+.skill-pane .sk-name{font-family:'Bebas Neue';font-size:13px;letter-spacing:2px;color:var(--gold);text-shadow:0 0 6px var(--gold);margin-bottom:3px;position:relative;z-index:1}
+.skill-pane .phrase{font-family:'Space Mono';font-size:9.5px;color:#fff;background:rgba(0,0,0,.55);padding:3px 6px;border-radius:3px;border-left:2px solid var(--yellow);margin-bottom:5px;position:relative;z-index:1}
+.skill-pane .cd-bar{height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;position:relative;z-index:1}
+.skill-pane .cd-fill{height:100%;width:38%;background:linear-gradient(90deg,var(--yellow),var(--green));box-shadow:0 0 4px var(--yellow)}
+.skill-pane .cd-text{font-family:'Space Mono';font-size:8px;color:#999;margin-top:2px;position:relative;z-index:1}
+
+/* ACTION PANE: your turn + dice + buttons */
+.action-pane{flex:1.4;background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(0,0,0,.7));border-color:var(--gold);box-shadow:0 0 14px rgba(255,215,0,.18)}
+.action-pane .content{padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.me-row{display:flex;align-items:center;gap:8px}
+.me-row .me-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:18px;color:#000;background:radial-gradient(circle,var(--gold),#FF6B00);border:2px solid var(--gold);box-shadow:0 0 12px var(--gold)}
+.me-row .info .name{font-family:'Bebas Neue';font-size:14px;letter-spacing:1.5px;color:var(--gold);text-shadow:0 0 6px var(--gold);line-height:1}
+.me-row .info .money{font-family:'Space Mono';font-size:14px;font-weight:700;color:var(--green);text-shadow:0 0 6px var(--green);line-height:1;margin-top:2px}
+.me-row .info .turn{font-family:'Bebas Neue';font-size:9px;letter-spacing:1.5px;color:var(--yellow);text-shadow:0 0 4px var(--yellow);margin-top:2px;animation:blink 1.2s infinite}
+.dice-panel{display:flex;justify-content:center;gap:4px;background:rgba(0,0,0,.4);padding:6px;border-radius:4px;border:1px solid rgba(255,215,0,.2)}
+.die{width:28px;height:28px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:20px;border-radius:4px;box-shadow:0 2px 0 #000}
+.act-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.act{font-family:'Bebas Neue';font-size:10px;letter-spacing:1px;padding:7px 0;border:1.5px solid #000;border-radius:4px;cursor:pointer;box-shadow:2px 2px 0 #000;transition:all .1s;line-height:1}
+.act:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 #000}
+.act.roll{background:linear-gradient(135deg,var(--yellow),#FF6B00);color:#000;grid-column:span 3;padding:10px 0;font-size:14px;letter-spacing:3px}
+.act.pump{background:var(--green);color:#000}
+.act.dump{background:var(--red);color:#fff}
+.act.market{background:var(--cyan);color:#000}
+.act.pump-dump{background:linear-gradient(90deg,var(--green) 50%,var(--red) 50%);color:#fff;grid-column:span 2}
+.act.trade{background:var(--pink);color:#fff}
+
+/* Scrollbars */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:rgba(0,217,255,.35);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,217,255,.7)}
+</style>
+</head>
+<body>
+
+<canvas id="kline"></canvas>
+
+<!-- TOP: BRAND + PULSE + LIVE FEED -->
+<div class="top-bar">
+  <span class="brand">CRYPTOPOLY</span>
+  <div class="pulse-compact">
+    <span style="color:#888;font-size:9px;letter-spacing:2px">PULSE</span>
+    <div class="mini-bar"><div class="r-seg"></div><div class="g-seg"></div></div>
+    <span class="val">+42</span>
+  </div>
+  <div class="feed"><div class="feed-track" id="feed"></div></div>
+</div>
+
+<div class="app">
+
+  <!-- LEFT: CHAT -->
+  <div class="chat-pane">
+    <div class="pane-h">💬 TRASH TALK <span class="tag">4 LIVE</span></div>
+    <div class="chat-msgs">
+      <div class="msg sys"><div class="tx">🎮 4 DEGENS JOINED</div></div>
+      <div class="msg trump"><div class="nm">TRUMP</div><div class="tx">BIGLY! TREMENDOUS!</div></div>
+      <div class="msg skill"><div class="tx">⚡ TRUMP +50% NEXT RENT</div></div>
+      <div class="msg elon"><div class="nm">ELON</div><div class="tx">doge to moon 🚀</div></div>
+      <div class="msg sys"><div class="tx">🚀 DOGE PUMPED → 2.10x</div></div>
+      <div class="msg cz"><div class="nm">CZ</div><div class="tx">4</div></div>
+      <div class="msg sys"><div class="tx">🐋 WHALE: 10K BTC → Binance</div></div>
+      <div class="msg vitalik"><div class="nm">VITALIK</div><div class="tx">gm. This is inefficient.</div></div>
+      <div class="msg skill"><div class="tx">⚡ VITALIK drew ALPHA</div></div>
+      <div class="msg trump"><div class="nm">TRUMP</div><div class="tx">Buying BITCOIN. Greatest coin ever.</div></div>
+      <div class="msg sys"><div class="tx">💰 TRUMP bought BTC @ $400</div></div>
+      <div class="msg elon"><div class="nm">ELON</div><div class="tx">rigged</div></div>
+    </div>
+    <div class="chat-input"><input placeholder="trash talk / skill phrase"></div>
+  </div>
+
+  <!-- CENTER: BOARD -->
+  <div class="center-pane">
+    <div class="board" id="board">
+      <div class="stage">
+        <div class="jojo trump" data-char="T"></div>
+        <div class="jojo elon" data-char="E"></div>
+        <div class="jojo cz" data-char="C"></div>
+        <div class="jojo vitalik" data-char="V"></div>
+        <div class="jojo satoshi" data-char="S"></div>
+
+        <div class="center-title">CRYPTOPOLY</div>
+        <div class="center-sub">DEGEN CASINO · TURN 17</div>
+
+        <div class="drama-box">
+          <div class="dbh">⚡ JUST HAPPENED</div>
+          <div class="drama-event rekt"><span class="ic">💀</span><span class="txt"><b>TRUMP</b> REKT <b>ELON</b> $340 rent on BTC</span><span class="time">3s</span></div>
+          <div class="drama-event moon"><span class="ic">🚀</span><span class="txt"><b>DOGE</b> +14% · ELON pumped</span><span class="time">8s</span></div>
+          <div class="drama-event news"><span class="ic">🏛️</span><span class="txt"><b>BTC RESERVE</b> signed · BTC +50%</span><span class="time">22s</span></div>
+        </div>
+
+        <div class="decks"><div class="dk wp">📄<br>WP</div><div class="dk al">🎲<br>AL</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT STACK -->
+  <div class="right-pane">
+    <!-- ACTION PANE (current player + actions) -->
+    <div class="action-pane">
+      <div class="pane-h" style="color:var(--gold);border-color:rgba(255,215,0,.3)">🎯 YOUR TURN</div>
+      <div class="content">
+        <div class="me-row">
+          <div class="me-avatar">T</div>
+          <div class="info">
+            <div class="name">TRUMP</div>
+            <div class="money">$3,400</div>
+            <div class="turn">▶ ACTIVE</div>
+          </div>
+        </div>
+        <div class="dice-panel">
+          <div class="die">⚁</div>
+          <div class="die">⚄</div>
+          <span style="color:var(--gold);font-family:'Space Mono';font-size:13px;font-weight:700;align-self:center;margin-left:6px">= 7</span>
+        </div>
+        <div class="act-btns">
+          <button class="act roll">🎲 ROLL</button>
+          <button class="act pump-dump">🚀/💀</button>
+          <button class="act market">🔨 MKT</button>
+          <button class="act trade">🤝 TRADE</button>
+          <button class="act" style="background:#555;color:#fff">⏭ END</button>
+          <button class="act" style="background:#222;color:var(--cyan);border-color:var(--cyan)">📊 STATS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WALLET RACE -->
+    <div class="wallet-pane">
+      <div class="pane-h">💰 WALLET RACE <span class="tag" id="scale">LIN</span></div>
+      <div class="content" id="wallet"></div>
+    </div>
+
+    <!-- SKILL -->
+    <div class="skill-pane">
+      <div class="pane-h" style="color:var(--gold);border-color:rgba(255,215,0,.3)">🎭 SKILL (CD)</div>
+      <div class="content">
+        <div class="sk-name">TREMENDOUS!</div>
+        <div class="phrase">Say "tremendous!" → +50% rent</div>
+        <div class="cd-bar"><div class="cd-fill"></div></div>
+        <div class="cd-text">COOLDOWN: 2 TURNS</div>
+      </div>
+    </div>
+
+    <!-- KILL FEED -->
+    <div class="kf-pane">
+      <div class="pane-h" style="color:var(--red);border-color:rgba(255,80,60,.25)">💀 KILLS</div>
+      <div class="content">
+        <div class="kf-row"><span class="k">TRUMP</span><span class="w">💸</span><span class="v">ELON -340</span></div>
+        <div class="kf-row"><span class="k">CZ</span><span class="w">🔨</span><span class="v">VITALIK -1.2k</span></div>
+        <div class="kf-row hack"><span class="k">MEV</span><span class="w">🥪</span><span class="v">ELON -80</span></div>
+        <div class="kf-row bear"><span class="k">BEAR</span><span class="w">🐻</span><span class="v">ALL -15%</span></div>
+        <div class="kf-row hack"><span class="k">HACK</span><span class="w">💥</span><span class="v">CZ -200</span></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ═════ K-LINE LIVE BG ═════
+const cvs = document.getElementById('kline'), ctx = cvs.getContext('2d');
+let candles = [], off = 0;
+const CW = 11, CG = 3;
+function initC() {
+  cvs.width = innerWidth; cvs.height = innerHeight; candles = [];
+  let p = innerHeight * 0.5;
+  const n = Math.ceil(innerWidth / (CW + CG)) + 6;
+  for (let i = 0; i < n; i++) {
+    const o = p; const chg = (Math.random() - 0.48) * 36; const c = o + chg;
+    candles.push({ o, c, h: Math.min(o, c) - Math.random() * 16, l: Math.max(o, c) + Math.random() * 16 });
+    p = c;
+    if (p < innerHeight * 0.18) p = innerHeight * 0.18 + Math.random() * 34;
+    if (p > innerHeight * 0.82) p = innerHeight * 0.82 - Math.random() * 34;
+  }
+}
+function dr() {
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  candles.forEach((cd, i) => {
+    const x = i * (CW + CG) - off;
+    if (x < -CW || x > cvs.width) return;
+    const up = cd.c < cd.o; const col = up ? '#14F195' : '#FF3355';
+    ctx.strokeStyle = col; ctx.fillStyle = col;
+    ctx.globalAlpha = 0.65;
+    ctx.beginPath(); ctx.moveTo(x + CW/2, cd.h); ctx.lineTo(x + CW/2, cd.l); ctx.stroke();
+    const bt = Math.min(cd.o, cd.c), bh = Math.abs(cd.o - cd.c) || 1;
+    ctx.globalAlpha = 0.38; ctx.fillRect(x, bt, CW, bh);
+    ctx.globalAlpha = 0.82; ctx.strokeRect(x, bt, CW, bh);
+  });
+  off += 0.4;
+  if (off > CW + CG) {
+    off = 0; candles.shift();
+    const last = candles[candles.length - 1] || { c: innerHeight * 0.5 };
+    const o = last.c; const chg = (Math.random() - 0.48) * 36; const c = o + chg;
+    candles.push({ o, c, h: Math.min(o, c) - Math.random() * 16, l: Math.max(o, c) + Math.random() * 16 });
+  }
+  requestAnimationFrame(dr);
+}
+initC(); dr();
+addEventListener('resize', initC);
+
+// ═════ BOARD ═════
+const SQ=[
+{id:0,t:'go',n:'AIRDROP',ic:'✈️',d:'+200'},
+{id:1,t:'p',n:'PEPE',g:'brown',price:60,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/pepe/large.png'},
+{id:2,t:'al',n:'ALPHA'},
+{id:3,t:'p',n:'TRUMP',g:'brown',price:60,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/official-trump/large.png'},
+{id:4,t:'tx',n:'GAS',ic:'⛽',d:'-200'},
+{id:5,t:'infra',n:'Uniswap',price:250,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/uniswap/large.png'},
+{id:6,t:'p',n:'Arbitrum',g:'lightblue',price:100,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/arbitrum/large.png'},
+{id:7,t:'wp',n:'WP'},
+{id:8,t:'p',n:'Optimism',g:'lightblue',price:100,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/optimism/large.png'},
+{id:9,t:'p',n:'Base',g:'lightblue',price:120,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/base-protocol/large.png'},
+{id:10,t:'jail',n:'SEC',ic:'🏛',d:'JAIL'},
+{id:11,t:'p',n:'Ethena',g:'pink',price:140,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/ethena/large.png'},
+{id:12,t:'u',n:'Gas⛽',price:150},
+{id:13,t:'p',n:'Ondo',g:'pink',price:140,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/ondo-finance/large.png'},
+{id:14,t:'p',n:'Pendle',g:'pink',price:160,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/pendle/large.png'},
+{id:15,t:'infra',n:'AAVE',price:250,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/aave/large.png'},
+{id:16,t:'p',n:'Sui',g:'orange',price:180,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/sui/large.png'},
+{id:17,t:'al',n:'ALPHA'},
+{id:18,t:'p',n:'TRON',g:'orange',price:180,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/tron/large.png'},
+{id:19,t:'p',n:'DOGE',g:'orange',price:200,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/dogecoin/large.png'},
+{id:20,t:'pk',n:'HODL',ic:'💎',d:'LOUNGE'},
+{id:21,t:'p',n:'Kraken',g:'red',price:220,logo:'https://assets.coingecko.com/markets/images/29/large/kraken.jpg'},
+{id:22,t:'wp',n:'WP'},
+{id:23,t:'p',n:'Bitget',g:'red',price:220,logo:'https://assets.coingecko.com/markets/images/540/large/Bitget.jpeg'},
+{id:24,t:'p',n:'Coinbase',g:'red',price:240,logo:'https://assets.coingecko.com/markets/images/23/large/Coinbase_Coin_Primary.jpg'},
+{id:25,t:'infra',n:'Hyper',price:250,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/hyperliquid/large.png'},
+{id:26,t:'p',n:'Bybit',g:'yellow',price:260,logo:'https://assets.coingecko.com/markets/images/698/large/bybit_spot.png'},
+{id:27,t:'p',n:'OKX',g:'yellow',price:260,logo:'https://assets.coingecko.com/markets/images/96/large/WeChat_Image_20220117220452.png'},
+{id:28,t:'u',n:'MEV🤖',price:150},
+{id:29,t:'p',n:'Binance',g:'yellow',price:280,logo:'https://assets.coingecko.com/markets/images/52/large/binance.jpg'},
+{id:30,t:'gj',n:'CFTC',ic:'🚨',d:'ENFORCE'},
+{id:31,t:'p',n:'Solana',g:'green',price:300,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/solana/large.png'},
+{id:32,t:'p',n:'BNB',g:'green',price:300,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/binancecoin/large.png'},
+{id:33,t:'al',n:'ALPHA'},
+{id:34,t:'p',n:'XRP',g:'green',price:320,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/ripple/large.png'},
+{id:35,t:'infra',n:'PolyMkt',price:250,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/polymarket/large.png'},
+{id:36,t:'wp',n:'WP'},
+{id:37,t:'p',n:'Ethereum',g:'darkblue',price:350,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/ethereum/large.png'},
+{id:38,t:'tx',n:'WHALE',ic:'🐋',d:'-100'},
+{id:39,t:'p',n:'Bitcoin',g:'darkblue',price:400,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/bitcoin/large.png'}
+];
+const GP = {};
+[10,9,8,7,6,5,4,3,2,1,0].forEach((id,i)=>GP[id]=[11,i+1]);
+[11,12,13,14,15,16,17,18,19].forEach((id,i)=>GP[id]=[10-i,1]);
+[20,21,22,23,24,25,26,27,28,29,30].forEach((id,i)=>GP[id]=[1,i+1]);
+[31,32,33,34,35,36,37,38,39].forEach((id,i)=>GP[id]=[i+2,11]);
+
+const PLAYERS = [
+  {id:'p1',name:'TRUMP',money:3400,aura:'#FFD700',initial:'T',active:true},
+  {id:'p2',name:'ELON',money:1200,aura:'#00D9FF',initial:'E'},
+  {id:'p3',name:'CZ',money:2100,aura:'#F3BA2F',initial:'C'},
+  {id:'p4',name:'VITALIK',money:0,aura:'#9945FF',initial:'V',rekt:true},
+];
+const OWNED={1:{owner:'p1',mult:1.23},3:{owner:'p1',mult:1.45,lev:2},11:{owner:'p3',mult:0.87},19:{owner:'p2',mult:2.1,lev:3},26:{owner:'p3',mult:1.1,lev:1},29:{owner:'p3',mult:1.35,lev:1},37:{owner:'p4',mult:0.92,lev:1},39:{owner:'p1',mult:1.7,lev:2},5:{owner:'p1'},15:{owner:'p3'},25:{owner:'p2'}};
+
+function mini(id) {
+  const s = id * 17 + 3;
+  const pts = [];
+  for (let i = 0; i < 12; i++) {
+    const x = (i / 11) * 100;
+    const y = 50 + Math.sin(s + i * 0.6) * 22 + (i - 6) * 1.6;
+    pts.push(`${x},${y}`);
+  }
+  const m = OWNED[id]?.mult || 1;
+  const col = m > 1 ? '#14F195' : m < 1 ? '#FF3355' : '#888';
+  return `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="2.5" style="filter:drop-shadow(0 0 3px ${col})"/></svg>`;
+}
+
+function getP(id) { return PLAYERS.find(p => p.id === id); }
+
+const board = document.getElementById('board');
+SQ.forEach(sq => {
+  const [r, c] = GP[sq.id];
+  const el = document.createElement('div');
+  el.className = 'c';
+  if (sq.t === 'go' || sq.t === 'jail' || sq.t === 'gj' || sq.t === 'pk') el.classList.add('corner');
+  if (sq.t === 'wp') el.classList.add('cwp');
+  if (sq.t === 'al') el.classList.add('cal');
+  if (sq.t === 'tx') el.classList.add('ctx');
+  if (sq.g) el.setAttribute('data-tier', sq.g);
+  else if (sq.t === 'infra') el.setAttribute('data-tier', 'infra');
+  else if (sq.t === 'u') el.setAttribute('data-tier', 'utility');
+  el.style.gridRow = r; el.style.gridColumn = c;
+
+  const ow = OWNED[sq.id];
+  let h = '';
+  if (sq.t === 'go' || sq.t === 'jail' || sq.t === 'gj' || sq.t === 'pk') {
+    h = `<span class="ic">${sq.ic}</span><span class="nm">${sq.n}</span><span class="sub">${sq.d||''}</span>`;
+  } else if (sq.t === 'wp') {
+    h = `<span style="font-size:clamp(12px,1.6vh,18px);filter:drop-shadow(0 0 8px var(--cyan))">📄</span><span class="nm" style="color:var(--cyan);font-size:8.5px;letter-spacing:.8px">WHITE<br>PAPER</span>`;
+  } else if (sq.t === 'al') {
+    h = `<span style="font-size:clamp(12px,1.6vh,18px);filter:drop-shadow(0 0 8px var(--pink))">🎲</span><span class="nm" style="color:var(--pink);font-size:10px">ALPHA</span>`;
+  } else if (sq.t === 'tx') {
+    h = `<span class="ic" style="font-size:clamp(12px,1.7vh,18px);color:#FF9800;filter:drop-shadow(0 0 6px #FF9800)">${sq.ic}</span><span class="nm">${sq.n}</span><span class="pr" style="color:#FF9800">${sq.d}</span>`;
+  } else {
+    h = `<div class="top-stripe"></div>`;
+    if (sq.logo) h += `<div class="lg"><img src="${sq.logo}" alt="" onerror="this.parentElement.innerHTML='<span style=font-size:14px>?</span>'"></div>`;
+    else h += `<div class="lg" style="display:flex;align-items:center;justify-content:center;font-size:13px">${sq.t==='u'?'⚡':'?'}</div>`;
+    h += `<span class="nm">${sq.n}</span>`;
+    h += `<span class="pr">$${sq.price}</span>`;
+    h += `<div class="mini">${mini(sq.id)}</div>`;
+    if (ow) {
+      const p = getP(ow.owner);
+      if (p) h += `<div class="own-dot" style="background:${p.aura};color:${p.aura}"></div>`;
+      if (ow.lev) { const lev = ['','2x','5x','10x','25x','100x'][ow.lev]; h += `<div class="lev-pill">${lev}</div>`; }
+    }
+  }
+  el.innerHTML = h;
+  board.appendChild(el);
+});
+
+// Wallet
+const wl = document.getElementById('wallet');
+const maxM = Math.max(...PLAYERS.map(p => p.money || 1));
+[...PLAYERS].sort((a,b) => b.money - a.money).forEach(p => {
+  const pct = maxM ? (p.money / maxM * 100) : 2;
+  const el = document.createElement('div');
+  el.className = 'w-row' + (p.rekt ? ' rekt' : '') + (p.active ? ' active' : '');
+  el.style.setProperty('--aura', p.aura);
+  el.innerHTML = `<div class="avatar">${p.initial}</div><div class="lbl"><span>${p.name}</span><span class="amt">${p.rekt?'REKT':'$'+p.money.toLocaleString()}</span></div><div class="bar"><div class="fill" style="width:${pct}%"></div></div>`;
+  wl.appendChild(el);
+});
+
+// News feed
+const news = [
+  '<span><span class="gold">▲ BTC $108K +2.3%</span></span>',
+  '<span><span class="up">🚀 DOGE +14%</span></span>',
+  '<span><span class="down">▼ ETH -0.8%</span></span>',
+  '<span><span class="gold">🏛️ TRUMP BTC RESERVE SIGNED</span></span>',
+  '<span><span class="up">📈 PEPE +280%</span></span>',
+  '<span><span class="down">💀 BYBIT HACKED $1.5B</span></span>',
+  '<span><span class="gold">4️⃣ CZ POSTED "4"</span></span>',
+  '<span><span class="up">🐸 KEKIUS MAXIMUS TRENDING</span></span>',
+  '<span><span class="down">⚖️ SEC CHARGES UNISWAP</span></span>',
+];
+document.getElementById('feed').innerHTML = news.concat(news).join(' · ');
+</script>
+</body>
+</html>

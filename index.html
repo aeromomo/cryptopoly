@@ -353,6 +353,81 @@ body{padding-top:40px}
 
 .footer{text-align:center;padding:50px;color:#0a0e16;font-size:11px;letter-spacing:3px;font-family:'Bebas Neue'}
 
+/* ═══════════ LOBBY ═══════════ */
+.lobby-overlay{position:fixed;inset:0;z-index:9998;background:radial-gradient(ellipse at center,rgba(15,8,25,.97),rgba(3,5,8,.99));display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;overflow-y:auto}
+.lobby-overlay.show{display:flex}
+.lobby-overlay::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(247,147,26,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(247,147,26,.04) 1px,transparent 1px);background-size:40px 40px;z-index:0;pointer-events:none}
+.lobby-box{background:linear-gradient(145deg,#0e1420,#0a0e18);border:3px solid #FFD700;border-radius:16px;padding:30px;max-width:640px;width:100%;box-shadow:6px 6px 0 #000,0 0 60px rgba(255,215,0,.3);z-index:2;position:relative}
+.lobby-title{font-family:'Bebas Neue';font-size:clamp(28px,5vw,56px);letter-spacing:4px;color:#FFD700;text-shadow:4px 4px 0 #000,0 0 24px #FFD700;text-align:center;transform:rotate(-1deg);margin-bottom:6px;line-height:.95}
+.lobby-sub{text-align:center;font-family:'JetBrains Mono';color:#aaa;font-size:12px;letter-spacing:2px;margin-bottom:24px}
+.lobby-id{background:#000;border:2px solid #FFD700;padding:16px;border-radius:8px;font-family:'JetBrains Mono';color:#FFD700;font-size:18px;text-align:center;letter-spacing:3px;margin-bottom:12px;font-weight:700;text-shadow:0 0 10px #FFD700;word-break:break-all}
+.lobby-copy-btn{font-family:'Bebas Neue';font-size:18px;letter-spacing:2px;color:#000;background:#FFD700;border:2px solid #000;padding:12px 24px;cursor:pointer;border-radius:6px;width:100%;margin-bottom:20px;box-shadow:4px 4px 0 #000}
+.lobby-copy-btn:hover{background:#FF6B00;color:#fff}
+.lobby-copy-btn.copied{background:#0f0}
+.lobby-players{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.lobby-player{display:flex;align-items:center;gap:14px;background:rgba(20,30,50,.5);border:2px solid var(--aura,#666);border-radius:10px;padding:10px 16px;box-shadow:0 0 16px var(--aura,#666)}
+.lobby-player.me{border-width:3px;box-shadow:0 0 24px var(--aura)}
+.lobby-player img{width:46px;height:46px;border-radius:50%;border:2px solid var(--aura,#666);object-fit:cover}
+.lobby-player .lp-info{flex:1}
+.lobby-player .lp-name{font-family:'Bebas Neue';font-size:18px;color:var(--aura,#fff);letter-spacing:2px;text-shadow:0 0 8px var(--aura,#fff)}
+.lobby-player .lp-char{font-family:'JetBrains Mono';font-size:10px;color:#888;letter-spacing:1px;margin-top:2px}
+.lobby-player .lp-host{background:#FFD700;color:#000;padding:2px 8px;border-radius:4px;font-family:'Bebas Neue';font-size:11px;letter-spacing:1px}
+.lobby-status{text-align:center;font-family:'Bebas Neue';font-size:14px;letter-spacing:2px;color:#aaa;margin-bottom:16px}
+.lobby-start-btn{font-family:'Bebas Neue';font-size:24px;letter-spacing:3px;color:#000;background:linear-gradient(135deg,#14F195,#0FBA6E);border:3px solid #000;padding:16px 40px;cursor:pointer;border-radius:10px;box-shadow:5px 5px 0 #000,0 0 30px rgba(20,241,149,.5);width:100%;transition:all .15s}
+.lobby-start-btn:hover:not(:disabled){transform:translate(-2px,-2px);box-shadow:7px 7px 0 #000,0 0 50px rgba(20,241,149,.7)}
+.lobby-start-btn:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(60%)}
+
+/* ═══════════ TURN INDICATOR ═══════════ */
+.turn-ind{position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:60;background:rgba(0,0,0,.9);border:2px solid var(--turn-aura,#FFD700);padding:8px 24px;border-radius:30px;font-family:'Bebas Neue';font-size:16px;letter-spacing:3px;color:var(--turn-aura,#FFD700);text-shadow:0 0 10px var(--turn-aura,#FFD700);box-shadow:0 0 20px var(--turn-aura,#FFD700);display:none;align-items:center;gap:10px}
+.turn-ind.show{display:flex}
+.turn-ind.your-turn{animation:your-turn-pulse 1s ease-in-out infinite}
+@keyframes your-turn-pulse{0%,100%{box-shadow:0 0 20px var(--turn-aura)}50%{box-shadow:0 0 40px var(--turn-aura),0 0 80px var(--turn-aura)}}
+.turn-ind img{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--turn-aura)}
+
+/* ═══════════ PLAYER LIST (sidebar) ═══════════ */
+.plist-side{position:fixed;top:60px;right:10px;z-index:50;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.plist-item{background:rgba(0,0,0,.85);border:2px solid var(--aura,#666);border-radius:30px;padding:4px 14px 4px 4px;display:flex;align-items:center;gap:8px;box-shadow:0 0 14px var(--aura,#666);backdrop-filter:blur(6px);pointer-events:auto;opacity:.6;transition:all .2s}
+.plist-item.active{opacity:1;transform:scale(1.05);box-shadow:0 0 24px var(--aura,#666)}
+.plist-item.rekt{opacity:.3;filter:grayscale(80%)}
+.plist-item img{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--aura,#666);object-fit:cover}
+.plist-item .pi-name{font-family:'Bebas Neue';font-size:13px;color:var(--aura,#fff);letter-spacing:1.5px;line-height:1}
+.plist-item .pi-money{font-family:'JetBrains Mono';font-size:10px;color:#14F195;font-weight:700;margin-top:2px}
+
+/* ═══════════ BUY/RENT MODAL ═══════════ */
+.game-modal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)}
+.game-modal.show{display:flex}
+.gm-box{background:linear-gradient(145deg,#0e1420,#0a0e18);border:3px solid var(--gm-aura,#FFD700);border-radius:16px;padding:24px;max-width:440px;width:100%;box-shadow:8px 8px 0 #000,0 0 60px var(--gm-aura,#FFD700);position:relative}
+.gm-title{font-family:'Bebas Neue';font-size:28px;letter-spacing:3px;color:var(--gm-aura);text-shadow:3px 3px 0 #000,0 0 16px var(--gm-aura);text-align:center;margin-bottom:12px;line-height:1}
+.gm-logo-wrap{display:flex;justify-content:center;margin-bottom:12px}
+.gm-logo{width:72px;height:72px;border-radius:50%;border:3px solid var(--gm-aura);overflow:hidden;box-shadow:0 0 24px var(--gm-aura)}
+.gm-logo img{width:100%;height:100%;object-fit:contain;background:rgba(0,0,0,.3)}
+.gm-price{font-family:'JetBrains Mono';font-size:22px;color:#fff;text-align:center;margin:10px 0;font-weight:700}
+.gm-info{font-family:'JetBrains Mono';font-size:12px;color:#aaa;text-align:center;margin-bottom:16px;line-height:1.6}
+.gm-info .hi{color:var(--gm-aura);font-weight:700}
+.gm-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.gm-btn{font-family:'Bebas Neue';font-size:16px;letter-spacing:2px;padding:10px 20px;border:2px solid #000;border-radius:8px;cursor:pointer;box-shadow:4px 4px 0 #000;transition:all .1s}
+.gm-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #000}
+.gm-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
+.gm-btn.buy{background:#14F195;color:#000}
+.gm-btn.pass{background:#555;color:#fff}
+.gm-btn.pay{background:#EF5350;color:#fff}
+.gm-btn.trade{background:#627EEA;color:#fff}
+
+/* ═══════════ TRADE PANEL ═══════════ */
+.trade-panel{position:fixed;bottom:20px;left:20px;z-index:55;background:rgba(0,0,0,.92);border:2px solid #9C27B0;border-radius:12px;padding:12px;max-width:280px;box-shadow:0 0 24px rgba(156,39,176,.5);display:none;backdrop-filter:blur(8px)}
+.trade-panel.show{display:block}
+.trade-panel h4{font-family:'Bebas Neue';font-size:14px;color:#9C27B0;letter-spacing:2px;margin-bottom:8px;text-shadow:0 0 8px #9C27B0}
+.trade-item{background:rgba(156,39,176,.1);border:1px solid #9C27B0;border-radius:8px;padding:8px;margin-bottom:6px;font-size:11px;color:#ddd;font-family:'JetBrains Mono'}
+.trade-item .ta{display:flex;gap:6px;margin-top:4px}
+.trade-item .ta button{flex:1;padding:4px 8px;font-size:10px;border:1px solid;border-radius:4px;cursor:pointer;background:transparent;font-family:'Bebas Neue';letter-spacing:1px}
+.trade-item .ta .acc{color:#0f0;border-color:#0f0}
+.trade-item .ta .rej{color:#f33;border-color:#f33}
+
+/* Property owner indicator on cells */
+.c[data-owned]{position:relative}
+.c .owner-flag{position:absolute;top:2px;right:2px;width:14px;height:14px;border-radius:50%;border:1.5px solid rgba(0,0,0,.8);z-index:5;box-shadow:0 0 6px currentColor}
+.c .lev-badge{position:absolute;bottom:2px;left:2px;background:#FFD700;color:#000;font-family:'Bebas Neue';font-size:9px;padding:1px 5px;border-radius:3px;letter-spacing:.5px;z-index:5;font-weight:900;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+
 /* ═══════════ CHARACTER SELECT ═══════════ */
 .char-overlay{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at center,rgba(20,10,30,.96),rgba(3,5,8,.99));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;overflow-y:auto}
 .char-overlay.hidden{display:none}
@@ -443,6 +518,39 @@ body{padding-top:40px}
 
 <!-- K-line candle background -->
 <canvas id="kline-bg"></canvas>
+
+<!-- ═══ LOBBY OVERLAY ═══ -->
+<div class="lobby-overlay" id="lobby">
+  <div class="lobby-box">
+    <div class="lobby-title">🎮 GAME LOBBY</div>
+    <div class="lobby-sub" id="lobby-sub">WAITING FOR DEGENS...</div>
+    <div class="lobby-id" id="lobby-id">LOADING...</div>
+    <button class="lobby-copy-btn" id="lobby-copy">📋 COPY INVITE LINK</button>
+    <div class="lobby-players" id="lobby-players"></div>
+    <div class="lobby-status" id="lobby-status">Min 2 players to start</div>
+    <button class="lobby-start-btn" id="lobby-start" disabled>START GAME</button>
+  </div>
+</div>
+
+<!-- Turn indicator -->
+<div class="turn-ind" id="turn-ind">
+  <img id="turn-img" src="" alt="">
+  <span id="turn-text">DEGEN's Turn</span>
+</div>
+
+<!-- Player list sidebar -->
+<div class="plist-side" id="plist-side"></div>
+
+<!-- Generic game modal (buy/rent/etc) -->
+<div class="game-modal" id="game-modal">
+  <div class="gm-box" id="gm-box"></div>
+</div>
+
+<!-- Trade panel (incoming offers) -->
+<div class="trade-panel" id="trade-panel">
+  <h4>📨 INCOMING TRADES</h4>
+  <div id="trade-list"></div>
+</div>
 
 <!-- ═══ CHARACTER SELECT OVERLAY ═══ -->
 <div id="char-select" class="char-overlay">
@@ -555,6 +663,92 @@ body{padding-top:40px}
 </div>
 
 <script>
+// ══════════════════════════════════════════════
+//  MULTIPLAYER SYNC ENGINE (BroadcastChannel + localStorage)
+// ══════════════════════════════════════════════
+// Works across tabs in same browser. For cross-browser, swap with Firebase/Supabase (see bottom).
+
+const MP = (() => {
+  const url=new URL(location.href);
+  let gameId=url.searchParams.get('game');
+  const isNewGame=!gameId;
+  if(isNewGame){
+    gameId='CP-'+Math.random().toString(36).substr(2,6).toUpperCase();
+    url.searchParams.set('game',gameId);
+    history.replaceState(null,'',url.toString());
+  }
+
+  // Get or create my player ID (persistent in sessionStorage per-tab)
+  let myId=sessionStorage.getItem('cp-myid');
+  if(!myId){myId='p-'+Math.random().toString(36).substr(2,8);sessionStorage.setItem('cp-myid',myId)}
+
+  const KEY='cp-game-'+gameId;
+  const ch=new BroadcastChannel('cp-'+gameId);
+
+  const defaultState=()=>({
+    id:gameId, host:null, status:'waiting',
+    players:[],  // {id, name, char, money, position, inJail, jailTurns, alive, joinedAt, online}
+    turnIdx:0, lastRoll:null, doubles:0,
+    properties:{},  // {posId: {owner, leverage, shares:{playerId:pct}}}
+    trades:[],      // {id, from, to, offer, demand, status}
+    events:[],      // {ts, type, text}
+    pumpIds:[], dumpIds:[],
+    seed:Math.random(),
+    version:0
+  });
+
+  let state=load()||defaultState();
+  const listeners=[];
+
+  function load(){
+    try{const s=localStorage.getItem(KEY);return s?JSON.parse(s):null}catch{return null}
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{}}
+  function notify(){listeners.forEach(fn=>{try{fn(state)}catch(e){console.error(e)}})}
+
+  function broadcast(){
+    state.version++;
+    save();
+    ch.postMessage({type:'state',state});
+    notify();
+  }
+
+  ch.onmessage=(e)=>{
+    if(e.data.type==='state'&&e.data.state.version>=(state.version||0)){
+      state=e.data.state;
+      save();
+      notify();
+    } else if(e.data.type==='req-state'){
+      // someone wants state, broadcast current
+      ch.postMessage({type:'state',state});
+    }
+  };
+
+  // on init, request state (in case another tab is host)
+  setTimeout(()=>ch.postMessage({type:'req-state'}),100);
+
+  window.addEventListener('beforeunload',()=>{
+    if(state&&state.players){
+      const me=state.players.find(p=>p.id===myId);
+      if(me){me.online=false;broadcast()}
+    }
+  });
+
+  return {
+    gameId, myId, isNewGame,
+    get state(){return state},
+    update(fn){fn(state);broadcast()},
+    onUpdate(fn){listeners.push(fn);fn(state)},
+    reset(){state=defaultState();state.host=myId;broadcast()},
+    inviteUrl:()=>location.origin+location.pathname+'?game='+gameId
+  };
+})();
+
+// Helper: get me
+function getMe(){return MP.state.players.find(p=>p.id===MP.myId)}
+function getCurrentTurnPlayer(){const s=MP.state;return s.players[s.turnIdx%s.players.length]}
+function isMyTurn(){const p=getCurrentTurnPlayer();return p&&p.id===MP.myId&&MP.state.status==='playing'}
+
 // ═══ CHARACTER SELECT ═══
 const CHARS={
   trump:{name:'TRUMP',aura:'#FFD700',aura2:'#E11D48',tag:'THE DEALMAKER',img:'img/trump.jpg'},
@@ -581,26 +775,64 @@ document.getElementById('char-start').addEventListener('click',()=>{
   const name=document.getElementById('name-input').value.trim();
   window.PLAYER.name=name||CHARS[window.PLAYER.char].name;
   const c=CHARS[window.PLAYER.char];
+
+  // Check if this character is already taken by another player
+  const taken=MP.state.players.find(p=>p.char===window.PLAYER.char&&p.id!==MP.myId);
+  if(taken){
+    alert(`${CHARS[window.PLAYER.char].name} is already taken by ${taken.name}. Pick another.`);
+    return;
+  }
+
+  // Join MP game
+  MP.update(s=>{
+    // ensure host
+    if(!s.host)s.host=MP.myId;
+    // remove me if I was already in (re-entry)
+    s.players=s.players.filter(p=>p.id!==MP.myId);
+    // add me
+    s.players.push({
+      id:MP.myId,
+      name:window.PLAYER.name,
+      char:window.PLAYER.char,
+      money:1500,
+      position:0,
+      inJail:false,
+      jailTurns:0,
+      alive:true,
+      online:true,
+      joinedAt:Date.now()
+    });
+    // set pump/dump state if not set
+    if(!s.pumpIds.length){
+      const props=SQ.filter(x=>x.t==='p').map(x=>x.id);
+      const shuffled=[...props].sort(()=>Math.random()-.5);
+      s.pumpIds=shuffled.slice(0,3);
+      s.dumpIds=shuffled.slice(3,5);
+    }
+  });
+
   // update player badge
   document.getElementById('pb-avatar-img').src=c.img;
   document.getElementById('pb-name').textContent=window.PLAYER.name.toUpperCase();
   document.getElementById('pb-char').textContent=c.name;
   document.getElementById('pb-money').textContent='1,500 USDT';
   document.querySelector('.player-badge').style.setProperty('--player-aura',c.aura);
-  // update token
+  // update token image (will be cloned per-player in renderPlayerTokens)
   const tokenImg=document.getElementById('token-img');
   if(tokenImg)tokenImg.src=c.img;
-  document.querySelector('.token').style.setProperty('--player-aura',c.aura);
-  // hide overlay with animation
+  const tokenEl=document.querySelector('.token');
+  if(tokenEl)tokenEl.style.setProperty('--player-aura',c.aura);
+  // hide character select
   const overlay=document.getElementById('char-select');
   if(window.gsap){
-    gsap.to(overlay,{opacity:0,duration:.6,ease:'power2.in',onComplete:()=>overlay.classList.add('hidden')});
-    gsap.from('.player-badge',{x:-300,duration:.8,ease:'back.out(1.5)',delay:.5,onStart:()=>{document.getElementById('player-badge').style.display='flex'}});
+    gsap.to(overlay,{opacity:0,duration:.4,ease:'power2.in',onComplete:()=>{overlay.classList.add('hidden');showLobby()}});
+    gsap.from('.player-badge',{x:-300,duration:.8,ease:'back.out(1.5)',delay:.2,onStart:()=>{document.getElementById('player-badge').style.display='flex'}});
   }else{
     overlay.classList.add('hidden');
     document.getElementById('player-badge').style.display='flex';
+    showLobby();
   }
-  // welcome sound
+
   setTimeout(()=>{
     if(window.confetti){
       confetti({particleCount:120,spread:90,origin:{x:.5,y:.5},colors:[c.aura,c.aura2,'#FFD700','#FFFFFF']});
@@ -610,11 +842,77 @@ document.getElementById('char-start').addEventListener('click',()=>{
   },600);
 });
 
+// ═══ LOBBY ═══
+function showLobby(){
+  const lobby=document.getElementById('lobby');
+  lobby.classList.add('show');
+  document.getElementById('lobby-id').textContent=MP.inviteUrl();
+  renderLobby();
+}
+function hideLobby(){
+  document.getElementById('lobby').classList.remove('show');
+}
+function renderLobby(){
+  const s=MP.state;
+  if(s.status==='playing'){hideLobby();return}
+  const ids=document.getElementById('lobby-id');
+  if(ids)ids.textContent=MP.inviteUrl();
+  const pl=document.getElementById('lobby-players');
+  if(!pl)return;
+  pl.innerHTML='';
+  s.players.forEach(p=>{
+    const c=CHARS[p.char];if(!c)return;
+    const el=document.createElement('div');
+    el.className='lobby-player'+(p.id===MP.myId?' me':'');
+    el.style.setProperty('--aura',c.aura);
+    el.innerHTML=`<img src="${c.img}" alt=""><div class="lp-info"><div class="lp-name">${p.name.toUpperCase()}</div><div class="lp-char">${c.name} · ${c.tag}</div></div>${p.id===s.host?'<span class="lp-host">HOST</span>':''}`;
+    pl.appendChild(el);
+  });
+  const startBtn=document.getElementById('lobby-start');
+  const isHost=s.host===MP.myId;
+  const status=document.getElementById('lobby-status');
+  if(!isHost){
+    startBtn.style.display='none';
+    status.textContent=`⏳ Waiting for host to start... (${s.players.length} player${s.players.length===1?'':'s'})`;
+  }else{
+    startBtn.style.display='block';
+    startBtn.disabled=false;
+    if(s.players.length===1){
+      startBtn.textContent='🎮 PLAY SOLO';
+      status.textContent=`🎩 Solo mode ready. Invite friends or play alone.`;
+    } else {
+      startBtn.textContent=`🎮 START (${s.players.length} PLAYERS)`;
+      status.textContent=`✅ Ready to start! (${s.players.length}/4)`;
+    }
+  }
+}
+document.getElementById('lobby-copy').addEventListener('click',()=>{
+  navigator.clipboard.writeText(MP.inviteUrl()).then(()=>{
+    const btn=document.getElementById('lobby-copy');
+    btn.classList.add('copied');
+    btn.textContent='✓ COPIED!';
+    setTimeout(()=>{btn.classList.remove('copied');btn.textContent='📋 COPY INVITE LINK'},1500);
+  }).catch(()=>alert('Copy failed. Manually copy: '+MP.inviteUrl()));
+});
+document.getElementById('lobby-start').addEventListener('click',()=>{
+  if(MP.state.host!==MP.myId)return;
+  MP.update(s=>{
+    s.status='playing';
+    s.turnIdx=0;
+    const mode=s.players.length===1?'SOLO':`${s.players.length} DEGENS`;
+    s.events.unshift({ts:Date.now(),type:'special',text:`GAME STARTED (${mode}) 🎲`});
+  });
+  hideLobby();
+  if(window.confetti){
+    confetti({particleCount:200,spread:120,origin:{x:.5,y:.5},colors:['#FFD700','#FF6B00','#14F195','#E11D48']});
+  }
+});
+
 // ═══ LOGOS ═══
 const L=n=>`https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/${n}/large.png`;
 const XC=n=>`https://assets.coingecko.com/markets/images/${n}`;
-const LOGOS={'DOGE':L('dogecoin'),'PEPE':L('pepe'),'Bitcoin':L('bitcoin'),'Ethereum':L('ethereum'),'TRUMP':L('official-trump'),'TRON':L('tron'),'XRP':L('ripple'),'Solana':L('solana'),'BNB Chain':L('binancecoin'),'Sui':L('sui'),'Arbitrum':L('arbitrum'),'Optimism':L('optimism'),'Base':L('base-protocol'),'Uniswap':L('uniswap'),'Aave':L('aave'),'MakerDAO':L('maker'),'Kraken':XC('29/large/kraken.jpg'),'Bitget':XC('540/large/Bitget.jpeg'),'Coinbase':XC('23/large/Coinbase_Coin_Primary.jpg'),'Bybit':XC('698/large/bybit_spot.png'),'OKX':XC('96/large/WeChat_Image_20220117220452.png'),'Binance':XC('52/large/binance.jpg'),'MetaMask':'https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg','Phantom':L('phantom'),'Trust Wallet':L('trust-wallet-token'),'Ledger':L('ledger-stax')};
-const FB={'DOGE':'🐕','PEPE':'🐸','TRUMP':'🏛','TRON':'⚡','XRP':'✕','Bitcoin':'₿','Ethereum':'⟠','Solana':'◎','BNB Chain':'◆','Sui':'💧','Arbitrum':'🔷','Optimism':'🔴','Base':'🔵','Uniswap':'🦄','Aave':'👻','MakerDAO':'Ⓜ','Kraken':'🐙','Bitget':'▲','Coinbase':'◉','Bybit':'▶','OKX':'⊕','Binance':'◆','MetaMask':'🦊','Phantom':'👻','Trust Wallet':'🛡','Ledger':'🔒','Gas Station':'⛽','MEV Bot':'🤖'};
+const LOGOS={'DOGE':L('dogecoin'),'PEPE':L('pepe'),'Bitcoin':L('bitcoin'),'Ethereum':L('ethereum'),'TRUMP':L('official-trump'),'TRON':L('tron'),'XRP':L('ripple'),'Solana':L('solana'),'BNB Chain':L('binancecoin'),'Sui':L('sui'),'Arbitrum':L('arbitrum'),'Optimism':L('optimism'),'Base':L('base-protocol'),'Uniswap':L('uniswap'),'Aave':L('aave'),'MakerDAO':L('maker'),'Kraken':XC('29/large/kraken.jpg'),'Bitget':XC('540/large/Bitget.jpeg'),'Coinbase':XC('23/large/Coinbase_Coin_Primary.jpg'),'Bybit':XC('698/large/bybit_spot.png'),'OKX':XC('96/large/WeChat_Image_20220117220452.png'),'Binance':XC('52/large/binance.jpg'),'OpenSea':'https://s2.coinmarketcap.com/static/img/exchanges/128x128/1345.png','Blur':L('blur'),'Magic Eden':L('magic-eden'),'Tensor':L('tensor')};
+const FB={'DOGE':'🐕','PEPE':'🐸','TRUMP':'🏛','TRON':'⚡','XRP':'✕','Bitcoin':'₿','Ethereum':'⟠','Solana':'◎','BNB Chain':'◆','Sui':'💧','Arbitrum':'🔷','Optimism':'🔴','Base':'🔵','Uniswap':'🦄','Aave':'👻','MakerDAO':'Ⓜ','Kraken':'🐙','Bitget':'▲','Coinbase':'◉','Bybit':'▶','OKX':'⊕','Binance':'◆','OpenSea':'🌊','Blur':'⚡','Magic Eden':'🪄','Tensor':'⬡','Gas Station':'⛽','MEV Bot':'🤖'};
 const GC={brown:'#8B5E3C',lightblue:'#29B6F6',pink:'#EC407A',orange:'#FF9800',red:'#EF5350',yellow:'#FFD600',green:'#66BB6A',darkblue:'#1E88E5',wallet:'#546E7A',utility:'#AB47BC'};
 const LC={brown:50,lightblue:50,pink:100,orange:100,red:150,yellow:150,green:200,darkblue:200};
 const BRAND={
@@ -626,8 +924,8 @@ const BRAND={
   'Uniswap':['#FF007A','#FF5BA6'],'Aave':['#B6509E','#2EBAC6'],'MakerDAO':['#1AAB9B','#F4B731'],
   'Kraken':['#5741D9','#7132F5'],'Bitget':['#00F0FF','#00B4BF'],'Coinbase':['#0052FF','#4A8FFF'],
   'Bybit':['#F7A600','#FFD040'],'OKX':['#FFFFFF','#9E9E9E'],'Binance':['#F0B90B','#FFD040'],
-  'MetaMask':['#F6851B','#E2761B'],'Phantom':['#AB9FF2','#534BB1'],
-  'Trust Wallet':['#3375BB','#48ADEF'],'Ledger':['#BDBDBD','#FFFFFF'],
+  'OpenSea':['#2081E2','#5AC4F8'],'Blur':['#FF8700','#FFB800'],
+  'Magic Eden':['#E42575','#9333EA'],'Tensor':['#BAFF29','#00FFB4'],
   'Gas Station':['#FF6F00','#FFA040'],'MEV Bot':['#9C27B0','#C154DE'],
   'AIRDROP':['#14F195','#0FBA6E'],'SEC':['#78909C','#455A64'],
   'HODL':['#42A5F5','#1E88E5'],'CFTC':['#EF5350','#C62828']
@@ -638,7 +936,7 @@ const TIER={
 };
 
 const SQ=[
-{id:0,t:'go',n:'AIRDROP',ic:'✈️',d:'COLLECT 200 USDT'},{id:1,t:'p',n:'PEPE',g:'brown',$:60,r:[2,10,30,90,160,250]},{id:2,t:'wp'},{id:3,t:'p',n:'TRUMP',g:'brown',$:60,r:[4,20,60,180,320,450]},{id:4,t:'tx',n:'GAS FEE',ic:'⛽',d:'PAY 200'},{id:5,t:'w',n:'MetaMask',$:200},{id:6,t:'p',n:'Optimism',g:'lightblue',$:100,r:[6,30,90,270,400,550]},{id:7,t:'al'},{id:8,t:'p',n:'Arbitrum',g:'lightblue',$:100,r:[6,30,90,270,400,550]},{id:9,t:'p',n:'Base',g:'lightblue',$:120,r:[8,40,100,300,450,600]},{id:10,t:'jail',n:'SEC',ic:'🏛',d:'DETENTION'},{id:11,t:'p',n:'MakerDAO',g:'pink',$:140,r:[10,50,150,450,625,750]},{id:12,t:'u',n:'Gas Station',$:150},{id:13,t:'p',n:'Aave',g:'pink',$:140,r:[10,50,150,450,625,750]},{id:14,t:'p',n:'Uniswap',g:'pink',$:160,r:[12,60,180,500,700,900]},{id:15,t:'w',n:'Phantom',$:200},{id:16,t:'p',n:'Sui',g:'orange',$:180,r:[14,70,200,550,750,950]},{id:17,t:'wp'},{id:18,t:'p',n:'TRON',g:'orange',$:180,r:[14,70,200,550,750,950]},{id:19,t:'p',n:'DOGE',g:'orange',$:200,r:[16,80,220,600,800,1000]},{id:20,t:'pk',n:'HODL',ic:'💎',d:'LOUNGE'},{id:21,t:'p',n:'Kraken',g:'red',$:220,r:[18,90,250,700,875,1050]},{id:22,t:'al'},{id:23,t:'p',n:'Bitget',g:'red',$:220,r:[18,90,250,700,875,1050]},{id:24,t:'p',n:'Coinbase',g:'red',$:240,r:[20,100,300,750,925,1100]},{id:25,t:'w',n:'Trust Wallet',$:200},{id:26,t:'p',n:'Bybit',g:'yellow',$:260,r:[22,110,330,800,975,1150]},{id:27,t:'p',n:'OKX',g:'yellow',$:260,r:[22,110,330,800,975,1150]},{id:28,t:'u',n:'MEV Bot',$:150},{id:29,t:'p',n:'Binance',g:'yellow',$:280,r:[24,120,360,850,1025,1200]},{id:30,t:'gj',n:'CFTC',ic:'🚨',d:'ENFORCEMENT'},{id:31,t:'p',n:'Solana',g:'green',$:300,r:[26,130,390,900,1100,1275]},{id:32,t:'p',n:'BNB Chain',g:'green',$:300,r:[26,130,390,900,1100,1275]},{id:33,t:'wp'},{id:34,t:'p',n:'XRP',g:'green',$:320,r:[28,150,450,1000,1200,1400]},{id:35,t:'w',n:'Ledger',$:200},{id:36,t:'al'},{id:37,t:'p',n:'Ethereum',g:'darkblue',$:350,r:[35,175,500,1100,1300,1500]},{id:38,t:'tx',n:'WHALE TAX',ic:'🐋',d:'PAY 100'},{id:39,t:'p',n:'Bitcoin',g:'darkblue',$:400,r:[50,200,600,1400,1700,2000]}
+{id:0,t:'go',n:'AIRDROP',ic:'✈️',d:'COLLECT 200 USDT'},{id:1,t:'p',n:'PEPE',g:'brown',$:60,r:[2,10,30,90,160,250]},{id:2,t:'wp'},{id:3,t:'p',n:'TRUMP',g:'brown',$:60,r:[4,20,60,180,320,450]},{id:4,t:'tx',n:'GAS FEE',ic:'⛽',d:'PAY 200'},{id:5,t:'w',n:'OpenSea',$:200},{id:6,t:'p',n:'Optimism',g:'lightblue',$:100,r:[6,30,90,270,400,550]},{id:7,t:'al'},{id:8,t:'p',n:'Arbitrum',g:'lightblue',$:100,r:[6,30,90,270,400,550]},{id:9,t:'p',n:'Base',g:'lightblue',$:120,r:[8,40,100,300,450,600]},{id:10,t:'jail',n:'SEC',ic:'🏛',d:'DETENTION'},{id:11,t:'p',n:'MakerDAO',g:'pink',$:140,r:[10,50,150,450,625,750]},{id:12,t:'u',n:'Gas Station',$:150},{id:13,t:'p',n:'Aave',g:'pink',$:140,r:[10,50,150,450,625,750]},{id:14,t:'p',n:'Uniswap',g:'pink',$:160,r:[12,60,180,500,700,900]},{id:15,t:'w',n:'Blur',$:200},{id:16,t:'p',n:'Sui',g:'orange',$:180,r:[14,70,200,550,750,950]},{id:17,t:'wp'},{id:18,t:'p',n:'TRON',g:'orange',$:180,r:[14,70,200,550,750,950]},{id:19,t:'p',n:'DOGE',g:'orange',$:200,r:[16,80,220,600,800,1000]},{id:20,t:'pk',n:'HODL',ic:'💎',d:'LOUNGE'},{id:21,t:'p',n:'Kraken',g:'red',$:220,r:[18,90,250,700,875,1050]},{id:22,t:'al'},{id:23,t:'p',n:'Bitget',g:'red',$:220,r:[18,90,250,700,875,1050]},{id:24,t:'p',n:'Coinbase',g:'red',$:240,r:[20,100,300,750,925,1100]},{id:25,t:'w',n:'Magic Eden',$:200},{id:26,t:'p',n:'Bybit',g:'yellow',$:260,r:[22,110,330,800,975,1150]},{id:27,t:'p',n:'OKX',g:'yellow',$:260,r:[22,110,330,800,975,1150]},{id:28,t:'u',n:'MEV Bot',$:150},{id:29,t:'p',n:'Binance',g:'yellow',$:280,r:[24,120,360,850,1025,1200]},{id:30,t:'gj',n:'CFTC',ic:'🚨',d:'ENFORCEMENT'},{id:31,t:'p',n:'Solana',g:'green',$:300,r:[26,130,390,900,1100,1275]},{id:32,t:'p',n:'BNB Chain',g:'green',$:300,r:[26,130,390,900,1100,1275]},{id:33,t:'wp'},{id:34,t:'p',n:'XRP',g:'green',$:320,r:[28,150,450,1000,1200,1400]},{id:35,t:'w',n:'Tensor',$:200},{id:36,t:'al'},{id:37,t:'p',n:'Ethereum',g:'darkblue',$:350,r:[35,175,500,1100,1300,1500]},{id:38,t:'tx',n:'WHALE TAX',ic:'🐋',d:'PAY 100'},{id:39,t:'p',n:'Bitcoin',g:'darkblue',$:400,r:[50,200,600,1400,1700,2000]}
 ];
 const GP={};
 [10,9,8,7,6,5,4,3,2,1,0].forEach((id,i)=>GP[id]=[11,i+1]);
@@ -997,12 +1295,17 @@ window.addEventListener('resize',()=>{
 let isRolling=false;
 function rollAndWalk(){
   if(isRolling)return;
+  // Turn-based check: only current player can roll in multiplayer
+  if(MP.state.status==='playing'&&!isMyTurn()){
+    const cp=getCurrentTurnPlayer();
+    popup(`WAIT — ${(cp?.name||'?').toUpperCase()}'S TURN`,'down');
+    return;
+  }
   isRolling=true;
   const btn=document.getElementById('roll-btn');
   const dd=document.getElementById('dice-display');
   btn.disabled=true;
 
-  // dice animation
   let rolls=0;
   const rollInterval=setInterval(()=>{
     const d1=1+Math.floor(Math.random()*6),d2=1+Math.floor(Math.random()*6);
@@ -1014,9 +1317,54 @@ function rollAndWalk(){
       const d1=1+Math.floor(Math.random()*6),d2=1+Math.floor(Math.random()*6);
       const steps=d1+d2;
       dd.textContent=`🎲 ${d1} + ${d2} = ${steps}`;
+      // sync roll to state
+      if(MP.state.status==='playing'){
+        MP.update(s=>{s.lastRoll={d1,d2,total:steps,playerId:MP.myId,ts:Date.now()}});
+      }
       setTimeout(()=>walkSteps(steps),400);
     }
   },80);
+}
+
+function advanceTurn(){
+  MP.update(s=>{
+    if(s.status!=='playing')return;
+    // find next alive player
+    const n=s.players.length;
+    let ni=(s.turnIdx+1)%n;
+    let safety=0;
+    while(!s.players[ni]?.alive&&safety<n){ni=(ni+1)%n;safety++}
+    s.turnIdx=ni;
+    s.events.unshift({ts:Date.now(),type:'neutral',text:`${s.players[ni].name.toUpperCase()}'S TURN`});
+    // maybe trigger market event (10% chance per turn after first round)
+    if(Math.random()<0.1&&s.turnIdx===0){triggerMarketEvent(s)}
+  });
+}
+
+// ═══ MARKET-WIDE EVENTS (Bull/Bear/Black Swan) ═══
+const MARKET_EVENTS=[
+  {type:'up',text:'🟢 BULL MARKET! All players +15% money',apply:s=>s.players.forEach(p=>{if(p.alive)p.money=Math.floor(p.money*1.15)})},
+  {type:'down',text:'🔴 BEAR MARKET! All players -15%',apply:s=>s.players.forEach(p=>{if(p.alive)p.money=Math.floor(p.money*.85)})},
+  {type:'special',text:'🐋 BLACK SWAN! Random player loses 50%',apply:s=>{const alive=s.players.filter(p=>p.alive);if(!alive.length)return;const v=alive[Math.floor(Math.random()*alive.length)];v.money=Math.floor(v.money*.5)}},
+  {type:'up',text:'✈️ MASS AIRDROP! Everyone +300 USDT',apply:s=>s.players.forEach(p=>{if(p.alive)p.money+=300})},
+  {type:'up',text:'🇺🇸 TRUMP PARDON! TRUMP owner +500',apply:s=>{const tp=s.properties[3];if(tp){const o=s.players.find(p=>p.id===tp.owner);if(o)o.money+=500}}},
+  {type:'up',text:'📊 ETF APPROVED FOR BTC! Bitcoin owner +500',apply:s=>{const bp=s.properties[39];if(bp){const o=s.players.find(p=>p.id===bp.owner);if(o)o.money+=500}}},
+  {type:'down',text:'⚖️ SEC CRACKDOWN! All CEX rent halved next round (flavor)',apply:_=>{}},
+  {type:'up',text:'🚀 ALT SEASON! All altcoin owners +100 per property',apply:s=>s.players.forEach(p=>{if(!p.alive)return;const n=Object.values(s.properties).filter(pr=>pr.owner===p.id).length;p.money+=n*100})},
+  {type:'down',text:'💀 EXCHANGE HACK! Random player -400',apply:s=>{const alive=s.players.filter(p=>p.alive);if(!alive.length)return;alive[Math.floor(Math.random()*alive.length)].money-=400}},
+  {type:'up',text:'4️⃣ CZ POSTED "4" — everyone +200',apply:s=>s.players.forEach(p=>{if(p.alive)p.money+=200})},
+];
+function triggerMarketEvent(s){
+  const ev=MARKET_EVENTS[Math.floor(Math.random()*MARKET_EVENTS.length)];
+  ev.apply(s);
+  s.events.unshift({ts:Date.now(),type:ev.type,text:'🌍 '+ev.text});
+  // flash screen
+  setTimeout(()=>{
+    popup(ev.text,ev.type);
+    if(ev.type==='up'){dingWin();if(window.confetti){confetti({particleCount:200,spread:180,origin:{x:.5,y:.4},colors:['#0f0','#14F195','#FFD700']})}}
+    else if(ev.type==='down'){dingLose();if(window.confetti){confetti({particleCount:200,spread:180,startVelocity:20,gravity:2,origin:{x:.5,y:.2},colors:['#f33','#c00'],shapes:['square']})}}
+    else{jackpot();if(window.confetti){confetti({particleCount:150,spread:140,origin:{x:.5,y:.4},colors:['#FFD700','#FF6B00','#627eea']})}}
+  },100);
 }
 
 async function walkSteps(n){
@@ -1025,6 +1373,10 @@ async function walkSteps(n){
   for(let i=0;i<n;i++){
     window.playerPos=(window.playerPos+1)%40;
     const pos=window.playerPos;
+    // Sync position to MP state
+    if(MP.state.status==='playing'){
+      MP.update(s=>{const me=s.players.find(p=>p.id===MP.myId);if(me)me.position=pos});
+    }
     const sqEl=document.querySelector(`.c[data-sqid="${pos}"]`);
     if(sqEl){
       sqEl.classList.add('walk-flash');
@@ -1037,6 +1389,9 @@ async function walkSteps(n){
     if(pos===0&&i>0){
       dd.textContent=`✈️ AIRDROP! +200 USDT`;
       if(window.PLAYER){window.PLAYER.money+=200;updateMoney()}
+      if(MP.state.status==='playing'){
+        MP.update(s=>{const me=s.players.find(p=>p.id===MP.myId);if(me)me.money+=200});
+      }
       popup('+200 AIRDROP','up');
       dingWin();
       pushEvent(`${pname} PASSED AIRDROP +200 USDT`,'special');
@@ -1121,8 +1476,236 @@ async function walkSteps(n){
     }
     dd.textContent='📍 '+label;
   }
-  setTimeout(()=>{document.getElementById('roll-btn').disabled=false;isRolling=false},1600);
+  // Process property landing for buy/rent (after animations settle)
+  setTimeout(()=>{
+    processPropertyLanding(window.playerPos, ()=>{
+      document.getElementById('roll-btn').disabled=false;
+      isRolling=false;
+      // In MP: advance turn after actions complete
+      if(MP.state.status==='playing'){
+        setTimeout(advanceTurn, 500);
+      }
+    });
+  },1400);
 }
+
+// ═══ BUY / RENT / LEVERAGE ═══
+function processPropertyLanding(pos, done){
+  const sq=SQ[pos];
+  if(!sq||(sq.t!=='p'&&sq.t!=='w'&&sq.t!=='u')){if(done)done();return}
+  const mpState=MP.state.status==='playing'?MP.state:null;
+  if(!mpState){if(done)done();return}  // single-player preview mode skips
+  const prop=mpState.properties[pos];
+  const me=getMe();
+  if(!me){if(done)done();return}
+
+  if(!prop){
+    // Unowned - offer to buy
+    if(me.money>=sq.$){
+      showBuyModal(sq, pos, done);
+    } else {
+      popup('TOO POOR TO BUY','down');
+      if(done)done();
+    }
+  } else if(prop.owner!==MP.myId){
+    // Owned by another player - pay rent
+    const rentAmt=calcRent(sq, pos, prop);
+    payRent(sq, pos, prop, rentAmt, done);
+  } else {
+    // Own it - maybe add leverage
+    const canLev=canAddLeverage(sq, pos);
+    if(canLev){
+      showLeverageModal(sq, pos, done);
+    } else {
+      if(done)done();
+    }
+  }
+}
+
+function calcRent(sq, pos, prop){
+  if(sq.t==='p'){
+    let rent=sq.r[prop.leverage||0];
+    // full set double
+    if((prop.leverage||0)===0){
+      const grp=SQ.filter(x=>x.g===sq.g&&x.t==='p');
+      const ownsAll=grp.every(x=>MP.state.properties[x.id]&&MP.state.properties[x.id].owner===prop.owner);
+      if(ownsAll)rent*=2;
+    }
+    return rent;
+  }
+  if(sq.t==='w'){
+    // NFT marketplace - count owned
+    const walletIds=[5,15,25,35];
+    const count=walletIds.filter(w=>MP.state.properties[w]&&MP.state.properties[w].owner===prop.owner).length;
+    return [0,25,50,100,200][count]||25;
+  }
+  if(sq.t==='u'){
+    const utilIds=[12,28];
+    const count=utilIds.filter(u=>MP.state.properties[u]&&MP.state.properties[u].owner===prop.owner).length;
+    const mult=count===2?10:4;
+    const lastRoll=MP.state.lastRoll?MP.state.lastRoll.total:7;
+    return lastRoll*mult;
+  }
+  return 0;
+}
+
+function canAddLeverage(sq, pos){
+  if(sq.t!=='p')return false;
+  const prop=MP.state.properties[pos];
+  if(!prop||prop.owner!==MP.myId)return false;
+  if((prop.leverage||0)>=5)return false;
+  const grp=SQ.filter(x=>x.g===sq.g&&x.t==='p');
+  return grp.every(x=>MP.state.properties[x.id]&&MP.state.properties[x.id].owner===MP.myId);
+}
+
+const LEV_COST={brown:50,lightblue:50,pink:100,orange:100,red:150,yellow:150,green:200,darkblue:200};
+
+function showBuyModal(sq, pos, done){
+  const me=getMe();
+  const brand=BRAND[sq.n]||['#FFD700','#FF6B00'];
+  const logo=LOGOS[sq.n];
+  const box=document.getElementById('gm-box');
+  box.style.setProperty('--gm-aura',brand[0]);
+  const groupLabel=sq.g?`${sq.g.toUpperCase()} TIER`:(sq.t==='w'?'NFT MARKETPLACE':'INFRASTRUCTURE');
+  box.innerHTML=`
+    <div class="gm-title">BUY ${sq.n}?</div>
+    <div class="gm-logo-wrap"><div class="gm-logo" style="--gm-aura:${brand[0]}"><img src="${logo||''}" onerror="this.style.display='none'"></div></div>
+    <div class="gm-price">${sq.$} USDT</div>
+    <div class="gm-info">
+      <div>${groupLabel}</div>
+      <div>Your balance: <span class="hi">${me.money.toLocaleString()} USDT</span></div>
+      ${sq.r?`<div>Base rent: ${sq.r[0]} &bull; Full set: ${sq.r[0]*2} &bull; 100x: ${sq.r[5]}</div>`:''}
+    </div>
+    <div class="gm-btns">
+      <button class="gm-btn buy" id="gm-buy">✓ BUY (${sq.$})</button>
+      <button class="gm-btn pass" id="gm-pass">✗ PASS</button>
+    </div>
+  `;
+  showGameModal();
+  document.getElementById('gm-buy').onclick=()=>{
+    MP.update(s=>{
+      const m=s.players.find(p=>p.id===MP.myId);
+      if(m&&m.money>=sq.$){
+        m.money-=sq.$;
+        s.properties[pos]={owner:MP.myId,leverage:0,shares:{[MP.myId]:100}};
+        s.events.unshift({ts:Date.now(),type:'special',text:`${m.name.toUpperCase()} BOUGHT ${sq.n} FOR ${sq.$}`});
+      }
+    });
+    popup(`BOUGHT ${sq.n}!`,'gold');
+    dingWin();
+    if(window.confetti){confetti({particleCount:60,spread:70,origin:{x:.5,y:.5},colors:[brand[0],brand[1],'#FFD700']})}
+    hideGameModal();
+    if(done)done();
+  };
+  document.getElementById('gm-pass').onclick=()=>{
+    hideGameModal();
+    if(done)done();
+  };
+}
+
+function payRent(sq, pos, prop, amt, done){
+  const me=getMe();
+  const owner=MP.state.players.find(p=>p.id===prop.owner);
+  if(!owner){if(done)done();return}
+  const brand=BRAND[sq.n]||['#EF5350','#C62828'];
+  const actualAmt=Math.min(amt,me.money);
+  const box=document.getElementById('gm-box');
+  box.style.setProperty('--gm-aura','#EF5350');
+  box.innerHTML=`
+    <div class="gm-title" style="color:#EF5350">💸 PAY RENT</div>
+    <div class="gm-logo-wrap"><div class="gm-logo" style="--gm-aura:${brand[0]}"><img src="${LOGOS[sq.n]||''}" onerror="this.style.display='none'"></div></div>
+    <div class="gm-price">-${amt} USDT</div>
+    <div class="gm-info">
+      <div>Owner: <span class="hi">${owner.name.toUpperCase()}</span></div>
+      <div>Property: ${sq.n}${prop.leverage?` (${['Spot','2x','5x','10x','25x','100x'][prop.leverage]})`:''}</div>
+      <div>Your balance: <span class="hi">${me.money.toLocaleString()}</span> → ${Math.max(0,me.money-amt).toLocaleString()}</div>
+    </div>
+    <div class="gm-btns">
+      <button class="gm-btn pay" id="gm-pay">💸 PAY ${actualAmt}</button>
+    </div>
+  `;
+  showGameModal();
+  document.getElementById('gm-pay').onclick=()=>{
+    MP.update(s=>{
+      const m=s.players.find(p=>p.id===MP.myId);
+      const o=s.players.find(p=>p.id===prop.owner);
+      if(m&&o){
+        const paid=Math.min(amt,m.money);
+        m.money-=paid;
+        // distribute per shares
+        const shares=prop.shares||{[o.id]:100};
+        Object.entries(shares).forEach(([pid,pct])=>{
+          const sp=s.players.find(pp=>pp.id===pid);
+          if(sp)sp.money+=Math.floor(paid*pct/100);
+        });
+        s.events.unshift({ts:Date.now(),type:'down',text:`${m.name.toUpperCase()} PAID ${paid} RENT TO ${o.name.toUpperCase()}`});
+        if(m.money<=0){
+          m.alive=false;
+          m.money=0;
+          s.events.unshift({ts:Date.now(),type:'down',text:`💀 ${m.name.toUpperCase()} LIQUIDATED!`});
+          // return properties to bank
+          for(const [pp,pr] of Object.entries(s.properties)){
+            if(pr.owner===m.id)delete s.properties[pp];
+          }
+        }
+      }
+    });
+    popup(`-${actualAmt} USDT`,'down');
+    dingLose();
+    hideGameModal();
+    if(done)done();
+  };
+}
+
+function showLeverageModal(sq, pos, done){
+  const prop=MP.state.properties[pos];
+  const me=getMe();
+  const cost=LEV_COST[sq.g]||100;
+  const curLev=prop.leverage||0;
+  const nextLev=curLev+1;
+  const levNames=['Spot','2x','5x','10x','25x','100x DEGEN'];
+  const brand=BRAND[sq.n]||['#FFD700','#FF6B00'];
+  if(me.money<cost){if(done)done();return}
+  const box=document.getElementById('gm-box');
+  box.style.setProperty('--gm-aura',brand[0]);
+  box.innerHTML=`
+    <div class="gm-title">⚡ ADD LEVERAGE?</div>
+    <div class="gm-logo-wrap"><div class="gm-logo" style="--gm-aura:${brand[0]}"><img src="${LOGOS[sq.n]||''}" onerror="this.style.display='none'"></div></div>
+    <div class="gm-info">
+      <div><span class="hi">${sq.n}</span></div>
+      <div>${levNames[curLev]} → <span class="hi">${levNames[nextLev]}</span></div>
+      <div>Next rent: <span class="hi">${sq.r[nextLev]} USDT</span></div>
+      <div>Cost: ${cost} USDT</div>
+    </div>
+    <div class="gm-btns">
+      <button class="gm-btn buy" id="gm-lev">⚡ LEVERAGE UP</button>
+      <button class="gm-btn pass" id="gm-pass">PASS</button>
+    </div>
+  `;
+  showGameModal();
+  document.getElementById('gm-lev').onclick=()=>{
+    MP.update(s=>{
+      const m=s.players.find(p=>p.id===MP.myId);
+      const p=s.properties[pos];
+      if(m&&p&&m.money>=cost){
+        m.money-=cost;
+        p.leverage=(p.leverage||0)+1;
+        s.events.unshift({ts:Date.now(),type:'up',text:`${m.name.toUpperCase()} LEVERAGED ${sq.n} TO ${levNames[p.leverage]} ⚡`});
+      }
+    });
+    popup(`${levNames[nextLev]}! ⚡`,'gold');
+    dingWin();
+    hideGameModal();
+    if(done)done();
+  };
+  document.getElementById('gm-pass').onclick=()=>{
+    hideGameModal();
+    if(done)done();
+  };
+}
+
+function showGameModal(){document.getElementById('game-modal').classList.add('show')}
+function hideGameModal(){document.getElementById('game-modal').classList.remove('show')}
 
 function updateMoney(){
   if(!window.PLAYER)return;
@@ -1157,6 +1740,179 @@ function startIdleChase(){
 
 // replace token on resize
 window.addEventListener('resize',()=>{if(window.playerPos!==undefined)placeToken(window.playerPos)});
+
+// ═══ MP STATE → UI RENDERING ═══
+function renderFromMP(state){
+  renderLobby();
+  renderPlayerList(state);
+  renderOwnershipFlags(state);
+  renderTurnIndicator(state);
+  renderTrades(state);
+  // sync my money from MP
+  const me=state.players.find(p=>p.id===MP.myId);
+  if(me){
+    const mEl=document.getElementById('pb-money');
+    if(mEl)mEl.textContent=me.money.toLocaleString()+' USDT';
+    if(window.PLAYER)window.PLAYER.money=me.money;
+  }
+  // sync all player tokens on board
+  renderAllTokens(state);
+  // render recent events in ticker
+  state.events.slice(0,3).forEach(ev=>{
+    if(!ev._rendered){ev._rendered=true;pushEvent(ev.text,ev.type)}
+  });
+}
+function renderPlayerList(s){
+  const side=document.getElementById('plist-side');
+  if(!side)return;
+  side.innerHTML='';
+  const currentPid=s.players[s.turnIdx%s.players.length]?.id;
+  s.players.forEach(p=>{
+    const c=CHARS[p.char];if(!c)return;
+    const el=document.createElement('div');
+    el.className='plist-item'+(p.id===currentPid?' active':'')+(!p.alive?' rekt':'');
+    el.style.setProperty('--aura',c.aura);
+    el.innerHTML=`<img src="${c.img}" alt=""><div><div class="pi-name">${p.name.toUpperCase()}${p.id===MP.myId?' (YOU)':''}</div><div class="pi-money">${p.alive?p.money.toLocaleString()+' USDT':'REKT'}</div></div>`;
+    side.appendChild(el);
+  });
+}
+function renderOwnershipFlags(s){
+  // Clear all
+  document.querySelectorAll('.c .owner-flag,.c .lev-badge').forEach(e=>e.remove());
+  document.querySelectorAll('.c[data-owned]').forEach(e=>e.removeAttribute('data-owned'));
+  for(const [pos,prop] of Object.entries(s.properties)){
+    const cell=document.querySelector(`.c[data-sqid="${pos}"]`);
+    if(!cell)continue;
+    const owner=s.players.find(p=>p.id===prop.owner);
+    if(!owner)continue;
+    const c=CHARS[owner.char];
+    cell.setAttribute('data-owned',prop.owner);
+    const flag=document.createElement('div');
+    flag.className='owner-flag';
+    flag.style.background=c.aura;
+    flag.style.color=c.aura;
+    flag.title=owner.name;
+    cell.appendChild(flag);
+    if(prop.leverage&&prop.leverage>0){
+      const badge=document.createElement('div');
+      badge.className='lev-badge';
+      badge.textContent=['','2x','5x','10x','25x','100x'][prop.leverage]||'';
+      cell.appendChild(badge);
+    }
+  }
+}
+function renderTurnIndicator(s){
+  const ind=document.getElementById('turn-ind');
+  if(!ind)return;
+  if(s.status!=='playing'){ind.classList.remove('show');return}
+  const cp=s.players[s.turnIdx%s.players.length];
+  if(!cp){ind.classList.remove('show');return}
+  const c=CHARS[cp.char];
+  ind.classList.add('show');
+  ind.style.setProperty('--turn-aura',c.aura);
+  document.getElementById('turn-img').src=c.img;
+  const isMe=cp.id===MP.myId;
+  document.getElementById('turn-text').textContent=isMe?`🎯 YOUR TURN — ROLL!`:`⏳ ${cp.name.toUpperCase()}'S TURN`;
+  ind.classList.toggle('your-turn',isMe);
+  // enable/disable roll
+  const rollBtn=document.getElementById('roll-btn');
+  if(rollBtn&&!isRolling)rollBtn.disabled=!isMe;
+}
+function renderAllTokens(s){
+  const board=document.getElementById('board');
+  if(!board)return;
+  // Remove tokens for left players
+  document.querySelectorAll('[data-mp-token]').forEach(el=>{
+    const pid=el.getAttribute('data-mp-token');
+    if(!s.players.find(p=>p.id===pid))el.remove();
+  });
+  // Place/update each player's token
+  s.players.forEach((p,i)=>{
+    if(!p.alive)return;
+    const c=CHARS[p.char];if(!c)return;
+    let tok=document.querySelector(`[data-mp-token="${p.id}"]`);
+    if(!tok){
+      tok=document.createElement('div');
+      tok.className='token';
+      tok.setAttribute('data-mp-token',p.id);
+      tok.style.setProperty('--player-aura',c.aura);
+      tok.innerHTML=`<img src="${c.img}" alt="">`;
+      board.appendChild(tok);
+    }
+    // position at player's square (with small offset for multi-player stack)
+    const sqEl=document.querySelector(`.c[data-sqid="${p.position||0}"]`);
+    if(sqEl){
+      const br=board.getBoundingClientRect();
+      const sr=sqEl.getBoundingClientRect();
+      const offsetX=(i%2)*12-6;
+      const offsetY=Math.floor(i/2)*12-6;
+      const x=sr.left-br.left+sr.width/2-tok.offsetWidth/2+offsetX;
+      const y=sr.top-br.top+sr.height/2-tok.offsetHeight/2+offsetY;
+      if(p.id===MP.myId){
+        // my token is the primary animated one - don't double-place
+        tok.style.display='none';
+      } else {
+        tok.style.display='';
+        if(window.gsap)gsap.to(tok,{left:x,top:y,duration:.3,ease:'power2.out'});
+        else{tok.style.left=x+'px';tok.style.top=y+'px'}
+      }
+    }
+  });
+}
+function renderTrades(s){
+  const panel=document.getElementById('trade-panel');
+  const list=document.getElementById('trade-list');
+  if(!panel||!list)return;
+  const pending=s.trades.filter(t=>t.to===MP.myId&&t.status==='pending');
+  if(pending.length===0){panel.classList.remove('show');return}
+  panel.classList.add('show');
+  list.innerHTML='';
+  pending.forEach(t=>{
+    const from=s.players.find(p=>p.id===t.from);
+    const el=document.createElement('div');
+    el.className='trade-item';
+    el.innerHTML=`<div><b>${from?from.name:'?'}</b> offers ${t.offer.money||0} USDT${t.offer.properties?.length?' + '+t.offer.properties.length+' props':''}</div><div>Wants: ${t.demand.money||0} USDT${t.demand.properties?.length?' + '+t.demand.properties.length+' props':''}</div><div class="ta"><button class="acc" onclick="acceptTrade('${t.id}')">ACCEPT</button><button class="rej" onclick="rejectTrade('${t.id}')">REJECT</button></div>`;
+    list.appendChild(el);
+  });
+}
+window.acceptTrade=function(tid){
+  MP.update(s=>{
+    const t=s.trades.find(x=>x.id===tid);if(!t)return;
+    const from=s.players.find(p=>p.id===t.from);
+    const to=s.players.find(p=>p.id===t.to);
+    if(!from||!to){t.status='rejected';return}
+    // check funds
+    if(from.money<(t.offer.money||0)||to.money<(t.demand.money||0)){t.status='rejected';return}
+    from.money-=(t.offer.money||0);
+    from.money+=(t.demand.money||0);
+    to.money-=(t.demand.money||0);
+    to.money+=(t.offer.money||0);
+    // transfer properties
+    (t.offer.properties||[]).forEach(pp=>{if(s.properties[pp])s.properties[pp].owner=to.id});
+    (t.demand.properties||[]).forEach(pp=>{if(s.properties[pp])s.properties[pp].owner=from.id});
+    t.status='accepted';
+    s.events.unshift({ts:Date.now(),type:'special',text:`🤝 TRADE ACCEPTED: ${from.name} ↔ ${to.name}`});
+  });
+  dingWin();
+};
+window.rejectTrade=function(tid){
+  MP.update(s=>{const t=s.trades.find(x=>x.id===tid);if(t)t.status='rejected'});
+  dingLose();
+};
+
+// Hook MP updates to UI
+MP.onUpdate(renderFromMP);
+
+// Auto-join flow: if URL has ?game= and we're not in char select, re-open it
+if(MP.gameId&&!MP.isNewGame){
+  // Existing game - just show char select
+  const charOverlay=document.getElementById('char-select');
+  if(charOverlay&&!charOverlay.classList.contains('hidden')){
+    // Update sub text
+    const titleSub=document.querySelector('.char-title');
+    if(titleSub){titleSub.innerHTML=`JOIN GAME<br><span style="font-size:.4em;color:#FFD700;letter-spacing:3px;text-shadow:2px 2px 0 #000">${MP.gameId}</span>`;}
+  }
+}
 
 // ═══ START GAME (after all definitions are done) ═══
 initGame();

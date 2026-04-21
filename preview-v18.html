@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CRYPTOPOLY v18 — 3D Dice + Attack Particles</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#05080F;
+  --board-bg:rgba(8,12,22,.88);
+  --cell-bg:rgba(14,20,32,.82);
+  --accent:#14B8D3;
+  --accent-2:#D45A9F;
+  --accent-3:#F0C04E;
+  --green:#2ED67A;
+  --red:#E23B60;
+  --gold:#F0C04E;
+  --text:#DBE4F0;
+  --text-dim:#6A7590;
+  --border:rgba(14,165,194,.22);
+}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow:hidden}
+canvas#kline{position:fixed;inset:0;z-index:0;opacity:.42}
+body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 55% 55% at 18% 22%,rgba(185,78,142,.1),transparent),radial-gradient(ellipse 55% 55% at 82% 78%,rgba(14,165,194,.1),transparent)}
+
+.top-strip{position:fixed;top:0;left:0;right:0;height:28px;z-index:100;background:rgba(5,8,15,.96);border-bottom:1px solid var(--accent-2);display:flex;align-items:center;padding:0 11px;font-family:'Space Mono';font-size:10px;font-weight:700;overflow:hidden;backdrop-filter:blur(8px)}
+.brand{font-family:'Bebas Neue';font-size:15.5px;letter-spacing:5px;background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--accent-3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:14px;flex-shrink:0;text-shadow:0 0 10px rgba(14,165,194,.3)}
+.pulse-mini{display:flex;align-items:center;gap:5px;margin-right:14px;flex-shrink:0}
+.pulse-mini span.l{color:#888;font-size:8.5px;letter-spacing:2px}
+.pulse-mini .mb{width:72px;height:4px;background:rgba(20,20,30,.8);border-radius:2px;overflow:hidden;display:flex}
+.pulse-mini .r-seg{flex:35;background:linear-gradient(90deg,transparent,var(--red))}
+.pulse-mini .g-seg{flex:65;background:linear-gradient(90deg,var(--green),transparent)}
+.pulse-mini .val{color:var(--green);text-shadow:0 0 5px var(--green);min-width:28px;font-size:9px}
+.feed{overflow:hidden;flex:1}
+.feed-track{display:inline-flex;gap:28px;white-space:nowrap;animation:scroll 55s linear infinite;padding-left:100%}
+@keyframes scroll{to{transform:translateX(-100%)}}
+.up{color:var(--green);text-shadow:0 0 5px var(--green)}
+.down{color:var(--red);text-shadow:0 0 5px var(--red)}
+.gold{color:var(--gold);text-shadow:0 0 5px var(--gold)}
+
+/* BOARD = only thing */
+.board-container{position:fixed;top:24px;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:6px;z-index:10}
+.board{display:grid;grid-template-columns:1.4fr repeat(9,1fr) 1.4fr;grid-template-rows:1.4fr repeat(9,1fr) 1.4fr;width:min(98vh,100vw);height:min(98vh,100vw);max-width:1360px;max-height:1360px;gap:3px;padding:6px;background:var(--board-bg);backdrop-filter:blur(12px);border:2px solid var(--border);border-radius:12px;box-shadow:0 0 48px rgba(14,165,194,.18),0 0 100px rgba(185,78,142,.08),inset 0 0 50px rgba(0,0,0,.7);position:relative}
+
+.c{background:var(--cell-bg);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.05);border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3px 2px 2px;position:relative;overflow:hidden;transition:all .15s;min-width:0;min-height:0}
+.c:hover{transform:translateY(-2px) scale(1.05);z-index:40;border-color:var(--brand,var(--accent));box-shadow:0 0 16px var(--brand,var(--accent))}
+.c .top-stripe{position:absolute;top:0;left:0;right:0;height:2.5px;background:var(--brand);box-shadow:0 0 5px var(--brand)}
+.c .lg{width:clamp(28px,4.5vh,58px);height:clamp(28px,4.5vh,58px);border-radius:50%;overflow:hidden;padding:2px;background:rgba(255,255,255,.05);flex-shrink:0;margin-top:4px;z-index:2;border:1.5px solid var(--brand);box-shadow:0 0 6px var(--brand)}
+.c .lg img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 4px var(--brand))}
+.c .nm{font-family:'Bebas Neue';font-size:clamp(7px,1.1vh,11px);color:#fff;line-height:1.1;letter-spacing:.5px;text-shadow:0 0 5px var(--brand);z-index:2;text-align:center;margin-top:3px}
+.c .price-live{display:flex;align-items:center;gap:3px;z-index:2;margin-top:2px;font-family:'Space Mono';font-weight:700;line-height:1}
+.c .price-live .p{font-size:clamp(7px,1vh,10px);color:#fff}
+.c .price-live .d{font-size:clamp(6px,.85vh,9px)}
+.c .price-live .d.up{color:var(--green);text-shadow:0 0 4px var(--green)}
+.c .price-live .d.down{color:var(--red);text-shadow:0 0 4px var(--red)}
+.c .mini{position:absolute;bottom:1px;left:2px;right:2px;height:14px;opacity:.85;z-index:1}
+.c .mini svg{width:100%;height:100%}
+.c .own-dot{position:absolute;top:3px;right:3px;width:12px;height:12px;border-radius:50%;border:1.5px solid #000;z-index:3;box-shadow:0 0 6px currentColor;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:8px;color:#000;font-weight:900;background:var(--owner-c)}
+.c .lev-pill{position:absolute;top:3px;left:3px;background:var(--gold);color:#000;font-family:'Bebas Neue';font-size:7.5px;padding:1px 3px;border-radius:2px;font-weight:900;z-index:3;line-height:1.2}
+.c[data-tier="brown"]{--brand:#A97A44} .c[data-tier="lightblue"]{--brand:#3BB3D9} .c[data-tier="pink"]{--brand:#D04A81} .c[data-tier="orange"]{--brand:#DB8125} .c[data-tier="red"]{--brand:#D0475E} .c[data-tier="yellow"]{--brand:#D4AE39} .c[data-tier="green"]{--brand:#5AA86B} .c[data-tier="darkblue"]{--brand:var(--accent)} .c[data-tier="infra"]{--brand:var(--accent-2)} .c[data-tier="utility"]{--brand:#8A46A6}
+.c.corner{background:radial-gradient(ellipse at center,rgba(26,38,54,.75),rgba(6,10,18,.9));border:1px solid var(--accent);justify-content:center;padding:5px 3px}
+.c.corner .ic{font-size:clamp(20px,3vh,36px);filter:drop-shadow(0 0 8px var(--accent));margin-bottom:3px}
+.c.corner .nm{font-family:'Bebas Neue';font-size:clamp(8px,1.2vh,14px);letter-spacing:1px;color:var(--accent);text-shadow:0 0 6px var(--accent)}
+.c.corner .sub{font-size:clamp(6px,.7vh,9px);color:#9aa;letter-spacing:.5px;margin-top:1px}
+.c.cwp{background:rgba(14,165,194,.18);border-color:var(--accent);justify-content:center}
+.c.cal{background:rgba(185,78,142,.18);border-color:var(--accent-2);justify-content:center}
+.c.ctx{background:rgba(219,129,37,.18);border-color:#DB8125;justify-content:center}
+
+/* STAGE — the center 9x9 with ALL UI embedded */
+.stage{grid-column:2/11;grid-row:2/11;position:relative;overflow:hidden;background:radial-gradient(ellipse at center,rgba(14,22,38,.6),rgba(3,5,10,.8));border-radius:6px;display:grid;grid-template-rows:auto 1fr auto;gap:4px;padding:5px}
+.stage::before{content:'';position:absolute;width:250%;height:250%;left:-75%;top:-75%;background:conic-gradient(from 0deg,transparent,rgba(14,165,194,.05),transparent,rgba(185,78,142,.05),transparent);animation:spin 60s linear infinite;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.stage-top,.stage-bot{display:grid;grid-template-columns:1.55fr 1fr 1.05fr;gap:5px;z-index:3}
+
+.chat-mini,.kf-mini,.skill-mini,.wallet-mini,.action-mini,.drama-mini{background:rgba(3,6,12,.7);backdrop-filter:blur(10px);border:1px solid rgba(14,165,194,.18);border-radius:5px;display:flex;flex-direction:column;overflow:hidden}
+.p-h{padding:4px 7px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;font-family:'Bebas Neue';font-size:9.5px;letter-spacing:2px;color:var(--phc,var(--accent));text-shadow:0 0 4px var(--phc,var(--accent));flex-shrink:0}
+.p-h .tag{font-family:'Space Mono';font-size:7.5px;padding:1px 4px;background:rgba(0,0,0,.4);border:1px solid currentColor;border-radius:2px;letter-spacing:.5px}
+
+.chat-mini{--phc:var(--accent)}
+.chat-mini .msgs{flex:1;overflow-y:auto;padding:5px 7px;display:flex;flex-direction:column;gap:4px;font-family:'Space Mono';font-size:11.5px}
+.msg{display:flex;gap:5px;line-height:1.3;align-items:baseline}
+.msg .nm{font-family:'Bebas Neue';font-size:10px;letter-spacing:.5px;color:var(--aura);text-shadow:0 0 3px var(--aura);flex-shrink:0}
+.msg .tx{color:#e8eef6;flex:1}
+.msg.trump{--aura:var(--gold)} .msg.elon{--aura:var(--accent)} .msg.cz{--aura:#D4AE39} .msg.vitalik{--aura:#8A46A6}
+.msg.sys{--aura:var(--accent-2)}
+.msg.sys .tx{color:var(--accent-2);font-style:italic;font-size:9.5px;text-shadow:0 0 2px var(--accent-2)}
+.msg.skill{--aura:var(--gold);background:linear-gradient(90deg,rgba(227,178,68,.15),transparent);padding:2px 4px;border-radius:2px;margin:1px 0}
+.msg.skill .tx{color:var(--gold);font-weight:700;text-shadow:0 0 3px var(--gold)}
+.chat-input-mini{padding:3px;border-top:1px solid rgba(255,255,255,.06);background:rgba(0,0,0,.3)}
+.chat-input-mini input{width:100%;background:rgba(0,0,0,.6);border:1px solid rgba(185,78,142,.3);color:#fff;padding:3px 6px;font-family:'Space Mono';font-size:9.5px;border-radius:2px;outline:none}
+
+.kf-mini{--phc:var(--red)}
+.kf-mini .kl{flex:1;overflow-y:auto;padding:4px 5px;display:flex;flex-direction:column;gap:2px;font-family:'Space Mono';font-size:9px;line-height:1.25}
+.kf-row{display:flex;gap:3px;align-items:center;padding:2px 4px;background:rgba(0,0,0,.5);border-left:2px solid var(--kf-c,var(--red));border-radius:2px}
+.kf-row .k{color:var(--green);font-weight:700;font-size:9px}
+.kf-row .w{font-size:11px;filter:drop-shadow(0 0 2px var(--kf-c))}
+.kf-row .v{color:#888;flex:1;text-align:right;font-size:8.5px}
+.kf-row.hack{--kf-c:var(--accent-2)} .kf-row.bear{--kf-c:var(--red)}
+
+.skill-mini{--phc:var(--gold);background:linear-gradient(135deg,rgba(227,178,68,.18),rgba(3,6,12,.7))}
+.skill-mini .content{padding:5px 7px;position:relative;overflow:hidden;flex:1}
+.skill-mini .content::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,.06) 50%,transparent 70%);animation:foil 4s infinite}
+@keyframes foil{0%,100%{transform:translateX(-30%)}50%{transform:translateX(30%)}}
+.skill-mini .sk-name{font-family:'Bebas Neue';font-size:11px;letter-spacing:1.5px;color:var(--gold);text-shadow:0 0 4px var(--gold);position:relative;z-index:1;line-height:1}
+.skill-mini .phrase{font-family:'Space Mono';font-size:9.5px;color:#fff;background:rgba(0,0,0,.5);padding:2px 4px;border-radius:2px;border-left:2px solid var(--gold);margin-top:3px;position:relative;z-index:1}
+.skill-mini .cd-bar{margin-top:4px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;position:relative;z-index:1}
+.skill-mini .cd-fill{height:100%;width:40%;background:linear-gradient(90deg,var(--gold),var(--green));box-shadow:0 0 4px var(--gold)}
+.skill-mini .cd-text{font-family:'Space Mono';font-size:8.5px;color:#999;margin-top:2px;position:relative;z-index:1}
+
+/* MIDDLE STAGE: Titans + title + attack arcs */
+.stage-middle{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:3;min-height:120px;padding:10px 8px}
+.jojo-wrap{position:absolute;inset:0}
+.jojo{position:absolute;width:clamp(36px,5.8vh,64px);height:clamp(36px,5.8vh,64px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:clamp(20px,3.2vh,32px);font-weight:900;color:#fff;z-index:4;border:3px solid var(--aura);box-shadow:0 0 18px var(--aura),inset 0 0 12px rgba(0,0,0,.5);background:radial-gradient(circle,rgba(0,0,0,.7),rgba(0,0,0,.95))}
+.jojo::before{content:'';position:absolute;inset:-16%;border-radius:50%;background:conic-gradient(from 0deg,var(--aura),transparent 50%,var(--aura));filter:blur(9px);z-index:-1;animation:spin 6s linear infinite;opacity:.55}
+.jojo .ch{text-shadow:0 0 8px var(--aura)}
+.jojo .mny{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-family:'Space Mono';font-size:clamp(8px,1vh,10px);font-weight:700;color:var(--green);text-shadow:0 0 6px var(--green);background:rgba(0,0,0,.85);padding:1px 6px;border-radius:3px;white-space:nowrap;border:1px solid var(--aura);animation:money-pulse 2s ease-in-out infinite}
+@keyframes satoshi-breathe{0%,100%{box-shadow:0 0 16px var(--aura),inset 0 0 12px rgba(0,0,0,.5)}50%{box-shadow:0 0 40px var(--aura),0 0 60px var(--aura),inset 0 0 12px rgba(0,0,0,.5)}} @keyframes money-pulse{0%,100%{text-shadow:0 0 3px currentColor}50%{text-shadow:0 0 8px currentColor,0 0 14px currentColor}}
+.jojo.trump{--aura:var(--gold);top:0;left:0}
+.jojo.elon{--aura:var(--accent);top:0;right:0}
+.jojo.cz{--aura:#D4AE39;bottom:2%;left:-1%}
+.jojo.vitalik{--aura:#8A46A6;bottom:2%;right:-1%}
+.jojo.vitalik .mny{color:var(--red);border-color:var(--red);text-shadow:0 0 6px var(--red)}
+.jojo.satoshi{--aura:var(--accent-2);top:50%;left:50%;transform:translate(-50%,-50%);font-size:clamp(16px,2.6vh,28px);opacity:.75;width:clamp(38px,6.2vh,68px);height:clamp(38px,6.2vh,68px);animation:satoshi-breathe 4s ease-in-out infinite}
+
+.center-title{font-family:'Bebas Neue';font-size:clamp(22px,4.2vh,52px);letter-spacing:8px;color:#fff;line-height:1;background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--gold),var(--accent));background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gr 5s ease infinite;filter:drop-shadow(0 0 12px #000) drop-shadow(0 0 24px rgba(14,165,194,.4));z-index:5;text-align:center}
+@keyframes gr{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.center-sub{font-family:'Space Mono';font-size:9.5px;color:#999;letter-spacing:3px;margin-top:3px;z-index:5}
+.decks{display:flex;gap:10px;margin-top:6px;z-index:5}
+.dk{width:40px;height:52px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:'Bebas Neue';font-size:8.5px;letter-spacing:1px;border:1.5px solid;backdrop-filter:blur(6px)}
+.dk.wp{border-color:var(--accent);color:var(--accent);background:rgba(14,165,194,.14)}
+.dk.al{border-color:var(--accent-2);color:var(--accent-2);background:rgba(185,78,142,.14)}
+.attack-lines{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.9}
+
+/* BOTTOM: wallet race + action (with dice) + drama */
+.wallet-mini{--phc:var(--green)}
+.wallet-mini .wc{flex:1;padding:4px 6px;display:flex;flex-direction:column;gap:4px;overflow-y:auto}
+.w-row{display:grid;grid-template-columns:24px 1fr;grid-template-rows:auto 6px;gap:1px 6px;align-items:center}
+.w-row .avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:11px;color:#fff;border:1.5px solid var(--aura);box-shadow:0 0 5px var(--aura);grid-row:1/3;background:radial-gradient(circle,rgba(0,0,0,.3),rgba(0,0,0,.85));text-shadow:0 0 3px var(--aura)}
+.w-row .lbl{display:flex;justify-content:space-between;align-items:baseline;gap:3px;font-family:'Bebas Neue';font-size:10px;letter-spacing:1px;color:var(--aura);text-shadow:0 0 4px var(--aura)}
+.w-row .lbl .amt{font-family:'Space Mono';font-size:9px;color:var(--green);text-shadow:0 0 3px var(--green);font-weight:700;animation:money-pulse 2s ease-in-out infinite}
+.w-row .lbl .change{font-family:'Space Mono';font-size:8px;padding:0 3px;border-radius:2px;font-weight:700}
+.w-row .lbl .change.up{color:var(--green);background:rgba(46,214,122,.15)}
+.w-row .lbl .change.down{color:var(--red);background:rgba(226,59,96,.15)}
+.w-row.rekt .amt{color:var(--red);text-shadow:0 0 3px var(--red);animation:none}
+.w-row .bar{height:6px;background:rgba(46,214,122,.1);border-radius:3px;overflow:hidden}
+.w-row .fill{height:100%;background:linear-gradient(90deg,var(--green),#1a9e5a);box-shadow:0 0 5px var(--green);border-radius:3px;transition:width .5s}
+.w-row.rekt .fill{background:var(--red)}
+.w-row.rekt .avatar{filter:grayscale(.6) brightness(.6)}
+.w-row.rekt .lbl>span:first-child{text-decoration:line-through;color:var(--red)}
+.w-row.active .lbl::before{content:'▶';color:var(--gold);animation:bl 1s infinite;font-size:8px;margin-right:2px}
+@keyframes bl{0%,60%,100%{opacity:1}70%,80%{opacity:.3}}
+
+.action-mini{--phc:var(--gold);background:linear-gradient(135deg,rgba(227,178,68,.2),rgba(3,6,12,.75));border-color:var(--gold)}
+.action-mini .ac{padding:5px 7px;display:flex;flex-direction:column;gap:5px}
+.me-row{display:flex;align-items:center;gap:6px}
+.me-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:15px;color:#000;background:radial-gradient(circle,var(--gold),#C58E1A);border:2px solid var(--gold);box-shadow:0 0 10px var(--gold);flex-shrink:0;font-weight:900}
+.me-info .name{font-family:'Bebas Neue';font-size:11px;letter-spacing:1.5px;color:var(--gold);text-shadow:0 0 4px var(--gold);line-height:1}
+.me-info .money{font-family:'Space Mono';font-size:12px;font-weight:700;color:var(--green);text-shadow:0 0 4px var(--green);line-height:1;margin-top:2px;animation:money-pulse 2s infinite}
+.me-info .turn{font-family:'Bebas Neue';font-size:8px;letter-spacing:1px;color:var(--gold);text-shadow:0 0 3px var(--gold);margin-top:2px;animation:bl 1.2s infinite}
+.dice-mini{display:flex;gap:4px;justify-content:center;background:rgba(0,0,0,.5);padding:3px;border-radius:3px;border:1px solid rgba(227,178,68,.25)}
+.die-mini{width:22px;height:22px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:16px;border-radius:3px;box-shadow:0 2px 0 #000}
+.dice-mini .eq{color:var(--gold);font-family:'Space Mono';font-size:11px;font-weight:700;align-self:center;margin-left:3px;text-shadow:0 0 4px var(--gold)}
+.act-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.act{font-family:'Bebas Neue';font-size:9px;letter-spacing:.8px;padding:5px 0;border:1.5px solid #000;border-radius:3px;cursor:pointer;box-shadow:2px 2px 0 #000;transition:all .1s;line-height:1}
+.act:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 #000}
+.act.roll{background:linear-gradient(135deg,var(--gold),#C58E1A);color:#000;grid-column:span 3;padding:7px 0;font-size:12px;letter-spacing:2px}
+.act.pump{background:var(--green);color:#000} .act.dump{background:var(--red);color:#fff} .act.market{background:var(--accent);color:#000} .act.trade{background:var(--accent-2);color:#fff} .act.end{background:#555;color:#fff}
+
+.drama-mini{--phc:var(--gold)}
+.drama-mini .dl{flex:1;padding:4px 5px;display:flex;flex-direction:column;gap:3px;overflow-y:auto}
+.drama-event{display:flex;align-items:center;gap:5px;padding:3px 4px;font-family:'Space Mono';font-size:9px;line-height:1.2;border-left:2.5px solid var(--dc,var(--gold));background:rgba(0,0,0,.4);border-radius:2px}
+.drama-event.rekt{--dc:var(--red)} .drama-event.moon{--dc:var(--green)} .drama-event.news{--dc:var(--gold)}
+.drama-event .ic{font-size:14px;filter:drop-shadow(0 0 2px var(--dc))}
+.drama-event .txt{flex:1;color:#f0f0f0;font-size:9px}
+.drama-event .txt b{color:var(--dc);text-shadow:0 0 2px var(--dc);font-weight:900}
+.drama-event .time{font-size:7.5px;color:#666}
+
+::-webkit-scrollbar{width:3px;height:3px} ::-webkit-scrollbar-thumb{background:rgba(14,165,194,.35);border-radius:2px}
+
+.c.pumping{animation:pump-flash 1.4s ease-in-out infinite}
+@keyframes pump-flash{0%,100%{box-shadow:inset 0 0 0 rgba(46,214,122,0),0 0 0 rgba(46,214,122,0)}50%{box-shadow:inset 0 0 18px rgba(46,214,122,.45),0 0 18px rgba(46,214,122,.55)}}
+.c.dumping{animation:dump-flash 1.3s ease-in-out infinite}
+@keyframes dump-flash{0%,100%{box-shadow:inset 0 0 0 rgba(226,59,96,0),0 0 0 rgba(226,59,96,0)}50%{box-shadow:inset 0 0 18px rgba(226,59,96,.5),0 0 22px rgba(226,59,96,.6)}}
+.c.pumping .top-stripe{animation:bright-pulse 1s ease-in-out infinite}
+.c.dumping .top-stripe{animation:bright-pulse 1s ease-in-out infinite}
+@keyframes bright-pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(2) drop-shadow(0 0 6px currentColor)}}
+.c .fx-badge{position:absolute;bottom:14px;right:1px;font-size:clamp(8px,1.1vh,12px);z-index:4;filter:drop-shadow(0 0 4px currentColor);animation:float-up 1.5s ease-in-out infinite;pointer-events:none}
+.c.pumping .fx-badge{color:var(--green)}
+.c.dumping .fx-badge{color:var(--red)}
+@keyframes float-up{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(-5px);opacity:1}}
+/* Stage frame more ornate */
+.stage{background:radial-gradient(ellipse at center,rgba(14,22,38,.7),rgba(3,5,10,.88));border:1.5px solid rgba(14,165,194,.25);box-shadow:inset 0 0 25px rgba(0,0,0,.6),0 0 16px rgba(14,165,194,.12)}
+.stage::after{content:'';position:absolute;inset:4px;border:1px dashed rgba(227,178,68,.22);border-radius:5px;pointer-events:none;z-index:2}
+/* Current player cell glow (TRUMP at pos 39 Bitcoin = example) */
+.c.current-player{box-shadow:inset 0 0 0 2.5px var(--gold),0 0 26px rgba(240,192,78,.75);animation:cp-pulse 1.3s ease-in-out infinite;z-index:5;transform:scale(1.04)}
+@keyframes cp-pulse{0%,100%{box-shadow:inset 0 0 0 2px var(--gold),0 0 16px rgba(227,178,68,.4)}50%{box-shadow:inset 0 0 0 2px var(--gold),0 0 28px rgba(227,178,68,.8)}}
+.c.current-player::before{content:"";position:absolute;inset:-4px;border:2px solid var(--gold);border-radius:7px;animation:cp-spotlight 2s ease-in-out infinite;pointer-events:none;z-index:1}
+@keyframes cp-spotlight{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+.c.current-player::after{content:'🎩';position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:18px;filter:drop-shadow(0 0 6px var(--gold));z-index:5}
+
+
+.c.spotlight{animation:sp-ring 3s ease-in-out infinite}
+@keyframes sp-ring{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4) drop-shadow(0 0 8px var(--gold))}}
+
+.hot-strip{display:flex;gap:8px;margin-top:6px;z-index:5;flex-wrap:wrap;justify-content:center;max-width:80%}
+.hot-item{font-family:'Space Mono';font-size:10px;font-weight:700;padding:3px 8px;border-radius:3px;backdrop-filter:blur(4px);border:1px solid currentColor;background:rgba(0,0,0,.55);letter-spacing:.5px}
+.hot-item.up{color:var(--green);box-shadow:0 0 6px rgba(46,214,122,.3);text-shadow:0 0 4px var(--green)}
+.hot-item.down{color:var(--red);box-shadow:0 0 6px rgba(226,59,96,.3);text-shadow:0 0 4px var(--red)}
+.scan-beam{position:absolute;top:0;bottom:0;width:80px;z-index:6;pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),rgba(20,184,211,.06),rgba(255,255,255,.04),transparent);animation:scan 7s linear infinite}
+@keyframes scan{0%{left:-80px}100%{left:calc(100% + 80px)}}
+
+.die-mini{width:24px;height:24px;background:linear-gradient(145deg,#fff 0%,#ddd 100%);color:#000;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:17px;border-radius:4px;box-shadow:0 3px 0 #222,0 5px 8px rgba(0,0,0,.4),inset 0 1px 0 #fff;animation:die-wiggle 3s ease-in-out infinite;position:relative}
+.die-mini:nth-child(2){animation-delay:-1.5s}
+@keyframes die-wiggle{0%,90%,100%{transform:rotate(0deg)}92%{transform:rotate(-8deg)}95%{transform:rotate(7deg)}97%{transform:rotate(-4deg)}}
+.die-mini::after{content:'';position:absolute;inset:0;border-radius:4px;box-shadow:inset 1px 1px 0 rgba(255,255,255,.8),inset -1px -1px 0 rgba(0,0,0,.15);pointer-events:none}
+
+.msgs .msg:last-child{animation:new-msg 1s ease-out}
+@keyframes new-msg{0%{background:rgba(227,178,68,.2)}100%{background:transparent}}
+</style>
+</head>
+<body>
+<canvas id="kline"></canvas>
+<div class="top-strip">
+  <span class="brand">CRYPTOPOLY</span>
+  <div class="pulse-mini"><span class="l">PULSE</span><div class="mb"><div class="r-seg"></div><div class="g-seg"></div></div><span class="val">+42</span></div>
+  <div class="feed"><div class="feed-track" id="feed"></div></div>
+</div>
+<div class="board-container">
+  <div class="board" id="board">
+    <div class="stage">
+      <div class="stage-top">
+        <div class="chat-mini">
+          <div class="p-h">💬 TRASH TALK <span class="tag">4 LIVE</span></div>
+          <div class="msgs">
+            <div class="msg sys"><span class="nm">SYS</span><span class="tx">🎮 4 JOINED</span></div>
+            <div class="msg trump"><span class="nm">TRUMP</span><span class="tx">TREMENDOUS! BIGLY!</span></div>
+            <div class="msg skill"><span class="tx">⚡ TRUMP +50% NEXT RENT</span></div>
+            <div class="msg elon"><span class="nm">ELON</span><span class="tx">doge to moon 🚀</span></div>
+            <div class="msg sys"><span class="nm">SYS</span><span class="tx">🚀 DOGE → 2.10x</span></div>
+            <div class="msg cz"><span class="nm">CZ</span><span class="tx">4</span></div>
+            <div class="msg vitalik"><span class="nm">VITALIK</span><span class="tx">gm. inefficient.</span></div>
+            <div class="msg skill"><span class="tx">⚡ DREW ALPHA</span></div>
+            <div class="msg sys"><span class="nm">SYS</span><span class="tx">💰 TRUMP bought BTC $400</span></div>
+            <div class="msg elon"><span class="nm">ELON</span><span class="tx">rigged 🤡</span></div>
+            <div class="msg sys"><span class="nm">SYS</span><span class="tx">💀 VITALIK LIQUIDATED</span></div>
+          </div>
+          <div class="chat-input-mini"><input placeholder="type / skill phrase"></div>
+        </div>
+        <div class="kf-mini">
+          <div class="p-h" style="color:var(--red)">💀 KILLS</div>
+          <div class="kl">
+            <div class="kf-row"><span class="k">TRUMP</span><span class="w">💸</span><span class="v">ELON -340</span></div>
+            <div class="kf-row"><span class="k">CZ</span><span class="w">🔨</span><span class="v">VIT -1.2k</span></div>
+            <div class="kf-row hack"><span class="k">MEV</span><span class="w">🥪</span><span class="v">ELON -80</span></div>
+            <div class="kf-row bear"><span class="k">BEAR</span><span class="w">🐻</span><span class="v">ALL -15%</span></div>
+            <div class="kf-row hack"><span class="k">HACK</span><span class="w">💥</span><span class="v">CZ -200</span></div>
+          </div>
+        </div>
+        <div class="skill-mini">
+          <div class="p-h">🎭 SKILL</div>
+          <div class="content">
+            <div class="sk-name">TREMENDOUS!</div>
+            <div class="phrase">Say "tremendous!" → +50%</div>
+            <div class="cd-bar"><div class="cd-fill"></div></div>
+            <div class="cd-text">CD: 2 TURNS</div>
+          </div>
+        </div>
+      </div>
+      <div class="stage-middle"><div class="scan-beam"></div>
+        <div class="jojo-wrap">
+          <div class="jojo trump"><span class="ch">T</span><span class="mny">$3.4k</span></div>
+          <div class="jojo elon"><span class="ch">E</span><span class="mny">$1.2k</span></div>
+          <div class="jojo cz"><span class="ch">C</span><span class="mny">$2.1k</span></div>
+          <div class="jojo vitalik"><span class="ch">V</span><span class="mny">REKT</span></div>
+          <div class="jojo satoshi"><span class="ch">S</span></div>
+          <svg class="attack-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+              <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#E23B60" style="filter:drop-shadow(0 0 2px #E23B60)"/></marker>
+              <marker id="ah2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><polygon points="0 0, 8 4, 0 8" fill="#E3B244" style="filter:drop-shadow(0 0 2px #E3B244)"/></marker>
+            </defs>
+            <path d="M 13 14 Q 50 2 84 14" fill="none" stroke="#E23B60" stroke-width="1.1" stroke-dasharray="2,2" style="filter:drop-shadow(0 0 4px #E23B60)" marker-end="url(#ah)"><animate attributeName="stroke-dashoffset" from="0" to="-8" dur=".8s" repeatCount="indefinite"/></path>
+            <path d="M 13 86 Q 50 98 84 86" fill="none" stroke="#E23B60" stroke-width="0.9" stroke-dasharray="2,1" style="filter:drop-shadow(0 0 3px #E23B60);opacity:.7" marker-end="url(#ah)"><animate attributeName="stroke-dashoffset" from="0" to="-6" dur="1.2s" repeatCount="indefinite"/></path>
+            <path d="M 8 18 Q -3 50 8 82" fill="none" stroke="#E3B244" stroke-width="0.5" stroke-dasharray="2,1.5" style="filter:drop-shadow(0 0 3px #E3B244);opacity:.55" marker-end="url(#ah2)"><animate attributeName="stroke-dashoffset" from="0" to="-5" dur="1.5s" repeatCount="indefinite"/></path>
+            <text x="50" y="6" fill="#E23B60" font-family="Bebas Neue,sans-serif" font-size="3" text-anchor="middle" style="filter:drop-shadow(0 0 3px #E23B60);font-weight:900">TRUMP REKT ELON −$340 💀</text>
+            <text x="50" y="96" fill="#E23B60" font-family="Bebas Neue,sans-serif" font-size="2.5" text-anchor="middle" opacity=".8">CZ REKT VITALIK −$1.2k 💀</text>
+          </svg>
+        </div>
+        <div class="center-title">CRYPTOPOLY</div>
+        <div class="center-sub">DEGEN CASINO · TURN 17</div>
+        <div class="hot-strip">
+          <span class="hot-item up">▲ DOGE +14.2%</span>
+          <span class="hot-item up">▲ PEPE +12.4%</span>
+          <span class="hot-item down">▼ BYBIT -22.0%</span>
+          <span class="hot-item up">▲ HYPER +18.4%</span>
+          <span class="hot-item down">▼ ETHENA -12.5%</span>
+        </div>
+        <div class="decks"><div class="dk wp">📄<br>WP</div><div class="dk al">🎲<br>AL</div></div>
+      </div>
+      <div class="stage-bot">
+        <div class="wallet-mini">
+          <div class="p-h" style="color:var(--green)">💰 WALLET RACE <span class="tag">LIN</span></div>
+          <div class="wc" id="wallet"></div>
+        </div>
+        <div class="action-mini">
+          <div class="p-h" style="color:var(--gold);border-color:rgba(227,178,68,.3)">🎯 YOUR TURN · T17</div>
+          <div class="ac">
+            <div class="me-row">
+              <div class="me-avatar">T</div>
+              <div class="me-info"><div class="name">TRUMP</div><div class="money">$3,400</div><div class="turn">▶ ACTIVE</div></div>
+            </div>
+            <div class="dice-mini"><div class="die-mini">⚁</div><div class="die-mini">⚄</div><span class="eq">= 7</span></div>
+            <div class="act-grid">
+              <button class="act roll">🎲 ROLL</button>
+              <button class="act pump">🚀 P</button><button class="act dump">💀 D</button><button class="act market">🔨</button>
+              <button class="act trade">🤝</button><button class="act end">⏭</button><button class="act" style="background:#222;color:var(--accent);border-color:var(--accent)">📊</button>
+            </div>
+          </div>
+        </div>
+        <div class="drama-mini">
+          <div class="p-h" style="color:var(--gold)">⚡ JUST HAPPENED</div>
+          <div class="dl">
+            <div class="drama-event rekt"><span class="ic">💀</span><span class="txt"><b>TRUMP</b> REKT <b>ELON</b> $340</span><span class="time">3s</span></div>
+            <div class="drama-event moon"><span class="ic">🚀</span><span class="txt"><b>DOGE</b> +14% · pump</span><span class="time">8s</span></div>
+            <div class="drama-event news"><span class="ic">🏛️</span><span class="txt"><b>BTC RESERVE</b> · BTC +50%</span><span class="time">22s</span></div>
+            <div class="drama-event rekt"><span class="ic">💥</span><span class="txt"><b>HACK</b> CZ −$200</span><span class="time">35s</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const cvs=document.getElementById('kline'),ctx=cvs.getContext('2d');let candles=[],off=0;const CW=11,CG=3;
+function iC(){cvs.width=innerWidth;cvs.height=innerHeight;candles=[];let p=innerHeight*.5;const n=Math.ceil(innerWidth/(CW+CG))+6;for(let i=0;i<n;i++){const o=p;const ch=(Math.random()-.48)*32;const c=o+ch;candles.push({o,c,h:Math.min(o,c)-Math.random()*14,l:Math.max(o,c)+Math.random()*14});p=c;if(p<innerHeight*.18)p=innerHeight*.18+Math.random()*30;if(p>innerHeight*.82)p=innerHeight*.82-Math.random()*30}}
+function dr(){ctx.clearRect(0,0,cvs.width,cvs.height);candles.forEach((cd,i)=>{const x=i*(CW+CG)-off;if(x<-CW||x>cvs.width)return;const up=cd.c<cd.o;const col=up?'#2ED67A':'#E23B60';ctx.strokeStyle=col;ctx.fillStyle=col;ctx.globalAlpha=.55;ctx.beginPath();ctx.moveTo(x+CW/2,cd.h);ctx.lineTo(x+CW/2,cd.l);ctx.stroke();const bt=Math.min(cd.o,cd.c),bh=Math.abs(cd.o-cd.c)||1;ctx.globalAlpha=.3;ctx.fillRect(x,bt,CW,bh);ctx.globalAlpha=.72;ctx.strokeRect(x,bt,CW,bh)});off+=.38;if(off>CW+CG){off=0;candles.shift();const last=candles[candles.length-1]||{c:innerHeight*.5};const o=last.c;const ch=(Math.random()-.48)*32;const c=o+ch;candles.push({o,c,h:Math.min(o,c)-Math.random()*14,l:Math.max(o,c)+Math.random()*14})}requestAnimationFrame(dr)}
+iC();dr();addEventListener('resize',iC);
+
+const SQ=[{id:0,t:'go',n:'AIRDROP',ic:'✈️',d:'+200'},{id:1,t:'p',n:'PEPE',g:'brown',price:60,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/pepe/large.png',change:'+12.4%',dir:'up'},{id:2,t:'al',n:'ALPHA'},{id:3,t:'p',n:'TRUMP',g:'brown',price:60,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/official-trump/large.png',change:'+45.2%',dir:'up'},{id:4,t:'tx',n:'GAS',ic:'⛽',d:'-200'},{id:5,t:'infra',n:'Uniswap',price:250,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/uniswap/large.png',change:'-0.3%',dir:'down'},{id:6,t:'p',n:'Arbitrum',g:'lightblue',price:100,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/arbitrum/large.png',change:'+2.1%',dir:'up'},{id:7,t:'wp',n:'WP'},{id:8,t:'p',n:'Optimism',g:'lightblue',price:100,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/optimism/large.png',change:'-1.2%',dir:'down'},{id:9,t:'p',n:'Base',g:'lightblue',price:120,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/base-protocol/large.png',change:'+4.8%',dir:'up'},{id:10,t:'jail',n:'SEC',ic:'🏛',d:'JAIL'},{id:11,t:'p',n:'Ethena',g:'pink',price:140,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/ethena/large.png',change:'-12.5%',dir:'down'},{id:12,t:'u',n:'Gas⛽',price:150,change:'+0.4%',dir:'up'},{id:13,t:'p',n:'Ondo',g:'pink',price:140,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/ondo-finance/large.png',change:'+8.3%',dir:'up'},{id:14,t:'p',n:'Pendle',g:'pink',price:160,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/pendle/large.png',change:'+3.1%',dir:'up'},{id:15,t:'infra',n:'AAVE',price:250,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/aave/large.png',change:'-2.8%',dir:'down'},{id:16,t:'p',n:'Sui',g:'orange',price:180,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/sui/large.png',change:'+6.2%',dir:'up'},{id:17,t:'al',n:'ALPHA'},{id:18,t:'p',n:'TRON',g:'orange',price:180,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/tron/large.png',change:'+1.5%',dir:'up'},{id:19,t:'p',n:'DOGE',g:'orange',price:200,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/dogecoin/large.png',change:'+14.2%',dir:'up'},{id:20,t:'pk',n:'HODL',ic:'💎',d:'LOUNGE'},{id:21,t:'p',n:'Kraken',g:'red',price:220,logo:'https://assets.coingecko.com/markets/images/29/large/kraken.jpg',change:'-0.8%',dir:'down'},{id:22,t:'wp',n:'WP'},{id:23,t:'p',n:'Bitget',g:'red',price:220,logo:'https://assets.coingecko.com/markets/images/540/large/Bitget.jpeg',change:'+2.4%',dir:'up'},{id:24,t:'p',n:'Coinbase',g:'red',price:240,logo:'https://assets.coingecko.com/markets/images/23/large/Coinbase_Coin_Primary.jpg',change:'-3.1%',dir:'down'},{id:25,t:'infra',n:'Hyper',price:250,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/hyperliquid/large.png',change:'+18.4%',dir:'up'},{id:26,t:'p',n:'Bybit',g:'yellow',price:260,logo:'https://assets.coingecko.com/markets/images/698/large/bybit_spot.png',change:'-22.0%',dir:'down'},{id:27,t:'p',n:'OKX',g:'yellow',price:260,logo:'https://assets.coingecko.com/markets/images/96/large/WeChat_Image_20220117220452.png',change:'+0.9%',dir:'up'},{id:28,t:'u',n:'MEV🤖',price:150,change:'+5.2%',dir:'up'},{id:29,t:'p',n:'Binance',g:'yellow',price:280,logo:'https://assets.coingecko.com/markets/images/52/large/binance.jpg',change:'+1.8%',dir:'up'},{id:30,t:'gj',n:'CFTC',ic:'🚨',d:'ENFORCE'},{id:31,t:'p',n:'Solana',g:'green',price:300,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/solana/large.png',change:'+5.6%',dir:'up'},{id:32,t:'p',n:'BNB',g:'green',price:300,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/binancecoin/large.png',change:'+2.2%',dir:'up'},{id:33,t:'al',n:'ALPHA'},{id:34,t:'p',n:'XRP',g:'green',price:320,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/ripple/large.png',change:'+0.6%',dir:'up'},{id:35,t:'infra',n:'PolyMkt',price:250,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/polymarket/large.png',change:'+8.1%',dir:'up'},{id:36,t:'wp',n:'WP'},{id:37,t:'p',n:'Ethereum',g:'darkblue',price:350,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/ethereum/large.png',change:'-0.8%',dir:'down'},{id:38,t:'tx',n:'WHALE',ic:'🐋',d:'-100'},{id:39,t:'p',n:'Bitcoin',g:'darkblue',price:400,logo:'https://cdn.jsdelivr.net/gh/simplr-sh/coin-logos/images/bitcoin/large.png',change:'+2.3%',dir:'up'}];
+const GP={};[10,9,8,7,6,5,4,3,2,1,0].forEach((id,i)=>GP[id]=[11,i+1]);[11,12,13,14,15,16,17,18,19].forEach((id,i)=>GP[id]=[10-i,1]);[20,21,22,23,24,25,26,27,28,29,30].forEach((id,i)=>GP[id]=[1,i+1]);[31,32,33,34,35,36,37,38,39].forEach((id,i)=>GP[id]=[i+2,11]);
+const PLAYERS=[{id:'p1',name:'TRUMP',money:3400,aura:'#E3B244',initial:'T',active:true,lastChange:'+340'},{id:'p2',name:'ELON',money:1200,aura:'#0EA5C2',initial:'E',lastChange:'-80'},{id:'p3',name:'CZ',money:2100,aura:'#D4AE39',initial:'C',lastChange:'+200'},{id:'p4',name:'VITALIK',money:0,aura:'#8A46A6',initial:'V',rekt:true,lastChange:'-1200'}];
+const OWNED={1:{owner:'p1'},3:{owner:'p1',lev:2},11:{owner:'p3'},19:{owner:'p2',lev:3},26:{owner:'p3',lev:1},29:{owner:'p3',lev:1},37:{owner:'p4',lev:1},39:{owner:'p1',lev:2},5:{owner:'p1'},15:{owner:'p3'},25:{owner:'p2'}};
+function mini(id,dir){const s=id*17+3;const pts=[];for(let i=0;i<14;i++){const x=(i/13)*100;const trend=dir==='up'?((i-7)*2.2):((7-i)*2.2);const y=50+Math.sin(s+i*.55)*18+trend;pts.push(`${x},${Math.max(5,Math.min(95,y))}`)}const col=dir==='up'?'#2ED67A':dir==='down'?'#E23B60':'#888';return `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="2.5" style="filter:drop-shadow(0 0 3px ${col})"/></svg>`}
+function getP(id){return PLAYERS.find(p=>p.id===id)}
+const board=document.getElementById('board');
+SQ.forEach(sq=>{const[r,c]=GP[sq.id];const el=document.createElement('div');el.className='c';if([19,3,25].includes(sq.id))el.classList.add('pumping');if([11,26].includes(sq.id))el.classList.add('dumping');if(sq.id===39)el.classList.add('current-player');if(sq.t==='go'||sq.t==='jail'||sq.t==='gj'||sq.t==='pk')el.classList.add('corner');if(sq.t==='wp')el.classList.add('cwp');if(sq.t==='al')el.classList.add('cal');if(sq.t==='tx')el.classList.add('ctx');if(sq.g)el.setAttribute('data-tier',sq.g);else if(sq.t==='infra')el.setAttribute('data-tier','infra');else if(sq.t==='u')el.setAttribute('data-tier','utility');el.style.gridRow=r;el.style.gridColumn=c;const ow=OWNED[sq.id];let h='';if(sq.t==='go'||sq.t==='jail'||sq.t==='gj'||sq.t==='pk'){h=`<span class="ic">${sq.ic}</span><span class="nm">${sq.n}</span><span class="sub">${sq.d||''}</span>`}else if(sq.t==='wp'){h=`<span style="font-size:clamp(14px,2vh,22px);filter:drop-shadow(0 0 7px var(--accent))">📄</span><span class="nm" style="color:var(--accent);font-size:9px;letter-spacing:.8px;margin-top:3px">WHITE<br>PAPER</span>`}else if(sq.t==='al'){h=`<span style="font-size:clamp(14px,2vh,22px);filter:drop-shadow(0 0 7px var(--accent-2))">🎲</span><span class="nm" style="color:var(--accent-2);font-size:10.5px;margin-top:3px">ALPHA</span>`}else if(sq.t==='tx'){h=`<span class="ic" style="font-size:clamp(14px,2vh,22px);color:#DB8125;filter:drop-shadow(0 0 5px #DB8125)">${sq.ic}</span><span class="nm">${sq.n}</span><span class="pr" style="color:#DB8125;font-family:Space Mono;font-size:10px;font-weight:700;margin-top:2px">${sq.d}</span>`}else{h=`<div class="top-stripe"></div>`;if(sq.logo)h+=`<div class="lg"><img src="${sq.logo}" alt="" onerror="this.parentElement.innerHTML='<span style=font-size:16px>?</span>'"></div>`;else h+=`<div class="lg" style="display:flex;align-items:center;justify-content:center;font-size:16px">${sq.t==='u'?'⚡':'?'}</div>`;h+=`<span class="nm">${sq.n}</span>`;h+=`<div class="price-live"><span class="p">$${sq.price}</span><span class="d ${sq.dir}">${sq.change}</span></div>`;h+=`<div class="mini">${mini(sq.id,sq.dir)}</div>`;if(ow){const p=getP(ow.owner);if(p)h+=`<div class="own-dot" style="--owner-c:${p.aura};color:${p.aura}">${p.initial}</div>`;if(ow.lev){const lev=['','2x','5x','10x','25x','100x'][ow.lev];h+=`<div class="lev-pill">${lev}</div>`}if([19,3,25].includes(sq.id))h+=`<div class="fx-badge">🚀</div>`;if([11,26].includes(sq.id))h+=`<div class="fx-badge">💀</div>`}}el.innerHTML=h;board.appendChild(el)});
+const wl=document.getElementById('wallet');const maxM=Math.max(...PLAYERS.map(p=>p.money||1));
+[...PLAYERS].sort((a,b)=>b.money-a.money).forEach(p=>{const pct=maxM?(p.money/maxM*100):2;const el=document.createElement('div');el.className='w-row'+(p.rekt?' rekt':'')+(p.active?' active':'');el.style.setProperty('--aura',p.aura);const ch=p.lastChange||'';const up=ch.startsWith('+');el.innerHTML=`<div class="avatar">${p.initial}</div><div class="lbl"><span>${p.name}</span><span class="change ${up?'up':'down'}">${ch}</span><span class="amt">${p.rekt?'REKT':'$'+p.money.toLocaleString()}</span></div><div class="bar"><div class="fill" style="width:${pct}%"></div></div>`;wl.appendChild(el)});
+const news=['<span><span class="gold">▲ BTC $108K +2.3%</span></span>','<span><span class="up">🚀 DOGE +14%</span></span>','<span><span class="down">▼ ETH -0.8%</span></span>','<span><span class="gold">🏛️ TRUMP BTC RESERVE</span></span>','<span><span class="up">📈 PEPE +280%</span></span>','<span><span class="down">💀 BYBIT HACKED $1.5B</span></span>','<span><span class="gold">4️⃣ CZ POSTED "4"</span></span>','<span><span class="up">🐸 KEKIUS MAXIMUS</span></span>','<span><span class="down">⚖️ SEC CHARGES UNI</span></span>'];
+document.getElementById('feed').innerHTML=news.concat(news).join(' · ');
+</script>
+</body>
+</html>

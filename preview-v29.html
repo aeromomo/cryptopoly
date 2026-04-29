@@ -865,138 +865,7 @@ body::before{background:
 }
 
 </style>
-<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js">
-/* === v29 CROSS-MACHINE SYNC via MQTT (public broker) === */
-let _mqttClient=null;
-const MQTT_BROKER="wss://broker.hivemq.com:8884/mqtt";
-const MQTT_TOPIC=()=>`cryptopoly/${GAME_ID}/+`;
-const MQTT_PUB=()=>`cryptopoly/${GAME_ID}/${MY_SEAT}`;
-
-function initMQTT(){
-  if(_mqttClient||!window.mqtt)return;
-  try{
-    _mqttClient=window.mqtt.connect(MQTT_BROKER,{
-      clientId:"cp-"+MY_SEAT+"-"+Math.random().toString(36).slice(2,8),
-      keepalive:30,reconnectPeriod:3000
-    });
-    _mqttClient.on("connect",()=>{
-      console.log("[MQTT] connected");
-      updateP2PStatus("📡 P2P CONNECTED");
-      _mqttClient.subscribe(MQTT_TOPIC(),{qos:0});
-      // announce
-      mqttSend({type:"HELLO"});
-      // send state
-      setTimeout(()=>mqttSend({type:"STATE_SYNC",positions:STATE.positions,turn:STATE.turn,owned:OWNED,mode:GAME_MODE,seats:Array.from(SEATS_TAKEN)}),400);
-    });
-    _mqttClient.on("message",(topic,msg)=>{
-      try{
-        const parts=topic.split("/");const fromSeat=parts[parts.length-1];
-        if(fromSeat===MY_SEAT)return;
-        const data=JSON.parse(msg.toString());
-        SEATS_TAKEN.add(fromSeat);
-        handleRemoteUnified(data,fromSeat);
-      }catch(e){console.warn("[MQTT] parse err",e)}
-    });
-    _mqttClient.on("error",e=>{
-      console.warn("[MQTT] err",e);
-      updateP2PStatus("⚠️ P2P RETRYING");
-    });
-    _mqttClient.on("close",()=>{
-      updateP2PStatus("🔄 P2P RECONNECTING");
-    });
-  }catch(e){
-    console.error("[MQTT] init failed",e);
-    updateP2PStatus("❌ P2P FAILED");
-  }
-}
-function mqttSend(action){
-  if(!_mqttClient||!_mqttClient.connected)return;
-  try{
-    _mqttClient.publish(MQTT_PUB(),JSON.stringify(action),{qos:0});
-  }catch(e){console.warn("[MQTT] send err",e)}
-}
-
-function updateP2PStatus(text){
-  let s=document.getElementById("p2p-status");
-  if(!s){
-    s=document.createElement("span");s.id="p2p-status";
-    s.style.cssText="font-family:Bebas Neue;letter-spacing:2px;font-size:10px;padding:3px 8px;border:1px solid #00FF88;color:#00FF88;border-radius:3px;text-shadow:0 0 4px #00FF88;flex-shrink:0";
-    const top=document.querySelector(".top-strip");
-    if(top){const inv=top.querySelector("#invite-btn");top.insertBefore(s,inv||top.querySelector(".feed"))}
-  }
-  s.textContent=text;
-  if(text.includes("CONNECTED")){s.style.color="#00FF88";s.style.borderColor="#00FF88"}
-  else if(text.includes("FAILED")){s.style.color="#FF2E5C";s.style.borderColor="#FF2E5C"}
-  else{s.style.color="#FFD700";s.style.borderColor="#FFD700"}
-}
-
-/* Unified remote handler — handles BroadcastChannel + MQTT */
-function handleRemoteUnified(a,from){
-  if(from)SEATS_TAKEN.add(from);
-  updateSeatBadge&&updateSeatBadge();
-  if(a.type==="HELLO"){
-    const reply={type:"STATE_SYNC",positions:STATE.positions,turn:STATE.turn,owned:OWNED,mode:GAME_MODE,seats:Array.from(SEATS_TAKEN)};
-    mqttSend(reply);
-    channel?.postMessage({action:reply,from:MY_SEAT,t:Date.now()});
-  }else if(a.type==="STATE_SYNC"){
-    if(a.positions)Object.assign(STATE.positions,a.positions);
-    if(a.turn&&a.turn>STATE.turn)STATE.turn=a.turn;
-    if(a.owned)Object.assign(OWNED,a.owned);
-    if(a.mode){GAME_MODE=a.mode;updateModeBadge&&updateModeBadge()}
-    if(a.seats)a.seats.forEach(s=>SEATS_TAKEN.add(s));
-    placeTokens&&placeTokens();
-    document.getElementById("turn-info")&&(document.getElementById("turn-info").textContent="DEGEN CASINO · TURN "+STATE.turn);
-    updateSeatBadge&&updateSeatBadge();
-  }else if(a.type==="ROLL"){sysChat&&sysChat(`🎲 ${getP(from)?.name||from} rolling...`)}
-  else if(a.type==="LAND"){
-    STATE.positions[from]=a.pos;
-    placeTokens&&placeTokens();
-    sysChat&&sysChat(`📍 ${getP(from)?.name||from} → ${SQ[a.pos]?.n||"?"}`);
-  }else if(a.type==="BUY"){
-    OWNED[a.pos]={owner:a.player,lev:a.lev||1};
-    redrawCell&&redrawCell(a.pos);
-    sysChat&&sysChat(`💰 ${getP(a.player)?.name||a.player} bought ${SQ[a.pos]?.n||"?"}`);
-  }else if(a.type==="CHAT"){
-    chatAdd&&chatAdd(BOT_CLS&&BOT_CLS[from]||"trump",getP(from)?.name||from,a.text);
-  }else if(a.type==="MODE"){GAME_MODE=a.mode;updateModeBadge&&updateModeBadge()}
-  else if(a.type==="END_TURN"){STATE.turn++;document.getElementById("turn-info")&&(document.getElementById("turn-info").textContent="DEGEN CASINO · TURN "+STATE.turn)}
-  else if(a.type==="PUMP"){const cell=document.querySelector(`[data-pos="${a.id}"]`);if(cell)cell.classList.add("pumping");const sq=SQ.find(s=>s.id===a.id);if(sq)eventAdd&&eventAdd("moon","🚀",`<b>${sq.n}</b> pumped by <b>${getP(from)?.name||from}</b>`)}
-  else if(a.type==="DUMP"){const cell=document.querySelector(`[data-pos="${a.id}"]`);if(cell){cell.classList.remove("pumping");cell.classList.add("dumping")}const sq=SQ.find(s=>s.id===a.id);if(sq)eventAdd&&eventAdd("rekt","💀",`<b>${sq.n}</b> dumped by <b>${getP(from)?.name||from}</b>`)}
-  else if(a.type==="SKILL"){chatAdd&&chatAdd("skill","SYS",`⚡ ${getP(from)?.name||from} ACTIVATED ${a.name} → ${a.fx}`)}
-  else if(a.type==="TRADE_OFFER"&&a.to===MY_SEAT){
-    const sq=SQ[a.prop];const fp=getP(a.from);
-    const m=document.createElement("div");m.className="card-modal";
-    m.innerHTML=`<div class="card-mo" style="--card-c:#FF1B8D"><div class="card-h">🤝 TRADE OFFER</div><div class="card-t">${fp?.name||a.from} → YOU</div><div class="card-d">Offers <b>${sq?.n||"?"}</b> for <b>$${a.ask}</b></div><div class="card-btns"><button class="card-btn go">ACCEPT</button><button class="card-btn skip">REJECT</button></div></div>`;
-    document.body.appendChild(m);
-    m.querySelector(".card-btn.go").onclick=()=>{addToast&&addToast("✅ TRADE ACCEPTED");m.remove();const reply={type:"TRADE_RESULT",from:a.from,to:MY_SEAT,result:"accepted",prop:a.prop};mqttSend(reply);channel?.postMessage({action:reply,from:MY_SEAT,t:Date.now()})};
-    m.querySelector(".card-btn.skip").onclick=()=>{addToast&&addToast("❌ TRADE REJECTED");m.remove();const reply={type:"TRADE_RESULT",from:a.from,to:MY_SEAT,result:"rejected"};mqttSend(reply);channel?.postMessage({action:reply,from:MY_SEAT,t:Date.now()})};
-  }else if(a.type==="TRADE_RESULT"&&a.from===MY_SEAT){addToast&&addToast(`🤝 TRADE ${a.result.toUpperCase()}`)}
-}
-
-/* Override broadcast to also publish via MQTT */
-const _origBroadcast3=window.__broadcast;
-window.__broadcast=function(action){
-  if(action.type==="STATE_SYNC")action.seats=Array.from(SEATS_TAKEN);
-  channel?.postMessage({action,from:MY_SEAT,t:Date.now()});
-  mqttSend(action);
-};
-
-/* Re-bind channel to use unified handler */
-if(typeof channel!=="undefined"&&channel){
-  channel.onmessage=function(e){
-    const{action,from}=e.data;if(from===MY_SEAT)return;
-    handleRemoteUnified(action,from);
-  };
-}
-
-function waitForMQTT(){if(window.mqtt)initMQTT();else setTimeout(waitForMQTT,300)}
-setTimeout(waitForMQTT,600);
-
-setInterval(()=>{if(_mqttClient&&_mqttClient.connected)mqttSend({type:"HELLO"})},8000);
-
-console.log("[v29] MQTT P2P sync layer loaded");
-
-</script>
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
 </head>
 <body>
 <canvas id="kline"></canvas>
@@ -2513,6 +2382,137 @@ function injectMarquee(){
   board.appendChild(frame);
 }
 setTimeout(injectMarquee,300);
+
+
+/* === v29 CROSS-MACHINE SYNC via MQTT (public broker) === */
+let _mqttClient=null;
+const MQTT_BROKER="wss://broker.hivemq.com:8884/mqtt";
+const MQTT_TOPIC=()=>`cryptopoly/${GAME_ID}/+`;
+const MQTT_PUB=()=>`cryptopoly/${GAME_ID}/${MY_SEAT}`;
+
+function initMQTT(){
+  if(_mqttClient||!window.mqtt)return;
+  try{
+    _mqttClient=window.mqtt.connect(MQTT_BROKER,{
+      clientId:"cp-"+MY_SEAT+"-"+Math.random().toString(36).slice(2,8),
+      keepalive:30,reconnectPeriod:3000
+    });
+    _mqttClient.on("connect",()=>{
+      console.log("[MQTT] connected");
+      updateP2PStatus("📡 P2P CONNECTED");
+      _mqttClient.subscribe(MQTT_TOPIC(),{qos:0});
+      // announce
+      mqttSend({type:"HELLO"});
+      // send state
+      setTimeout(()=>mqttSend({type:"STATE_SYNC",positions:STATE.positions,turn:STATE.turn,owned:OWNED,mode:GAME_MODE,seats:Array.from(SEATS_TAKEN)}),400);
+    });
+    _mqttClient.on("message",(topic,msg)=>{
+      try{
+        const parts=topic.split("/");const fromSeat=parts[parts.length-1];
+        if(fromSeat===MY_SEAT)return;
+        const data=JSON.parse(msg.toString());
+        SEATS_TAKEN.add(fromSeat);
+        handleRemoteUnified(data,fromSeat);
+      }catch(e){console.warn("[MQTT] parse err",e)}
+    });
+    _mqttClient.on("error",e=>{
+      console.warn("[MQTT] err",e);
+      updateP2PStatus("⚠️ P2P RETRYING");
+    });
+    _mqttClient.on("close",()=>{
+      updateP2PStatus("🔄 P2P RECONNECTING");
+    });
+  }catch(e){
+    console.error("[MQTT] init failed",e);
+    updateP2PStatus("❌ P2P FAILED");
+  }
+}
+function mqttSend(action){
+  if(!_mqttClient||!_mqttClient.connected)return;
+  try{
+    _mqttClient.publish(MQTT_PUB(),JSON.stringify(action),{qos:0});
+  }catch(e){console.warn("[MQTT] send err",e)}
+}
+
+function updateP2PStatus(text){
+  let s=document.getElementById("p2p-status");
+  if(!s){
+    s=document.createElement("span");s.id="p2p-status";
+    s.style.cssText="font-family:Bebas Neue;letter-spacing:2px;font-size:10px;padding:3px 8px;border:1px solid #00FF88;color:#00FF88;border-radius:3px;text-shadow:0 0 4px #00FF88;flex-shrink:0";
+    const top=document.querySelector(".top-strip");
+    if(top){const inv=top.querySelector("#invite-btn");top.insertBefore(s,inv||top.querySelector(".feed"))}
+  }
+  s.textContent=text;
+  if(text.includes("CONNECTED")){s.style.color="#00FF88";s.style.borderColor="#00FF88"}
+  else if(text.includes("FAILED")){s.style.color="#FF2E5C";s.style.borderColor="#FF2E5C"}
+  else{s.style.color="#FFD700";s.style.borderColor="#FFD700"}
+}
+
+/* Unified remote handler — handles BroadcastChannel + MQTT */
+function handleRemoteUnified(a,from){
+  if(from)SEATS_TAKEN.add(from);
+  updateSeatBadge&&updateSeatBadge();
+  if(a.type==="HELLO"){
+    const reply={type:"STATE_SYNC",positions:STATE.positions,turn:STATE.turn,owned:OWNED,mode:GAME_MODE,seats:Array.from(SEATS_TAKEN)};
+    mqttSend(reply);
+    channel?.postMessage({action:reply,from:MY_SEAT,t:Date.now()});
+  }else if(a.type==="STATE_SYNC"){
+    if(a.positions)Object.assign(STATE.positions,a.positions);
+    if(a.turn&&a.turn>STATE.turn)STATE.turn=a.turn;
+    if(a.owned)Object.assign(OWNED,a.owned);
+    if(a.mode){GAME_MODE=a.mode;updateModeBadge&&updateModeBadge()}
+    if(a.seats)a.seats.forEach(s=>SEATS_TAKEN.add(s));
+    placeTokens&&placeTokens();
+    document.getElementById("turn-info")&&(document.getElementById("turn-info").textContent="DEGEN CASINO · TURN "+STATE.turn);
+    updateSeatBadge&&updateSeatBadge();
+  }else if(a.type==="ROLL"){sysChat&&sysChat(`🎲 ${getP(from)?.name||from} rolling...`)}
+  else if(a.type==="LAND"){
+    STATE.positions[from]=a.pos;
+    placeTokens&&placeTokens();
+    sysChat&&sysChat(`📍 ${getP(from)?.name||from} → ${SQ[a.pos]?.n||"?"}`);
+  }else if(a.type==="BUY"){
+    OWNED[a.pos]={owner:a.player,lev:a.lev||1};
+    redrawCell&&redrawCell(a.pos);
+    sysChat&&sysChat(`💰 ${getP(a.player)?.name||a.player} bought ${SQ[a.pos]?.n||"?"}`);
+  }else if(a.type==="CHAT"){
+    chatAdd&&chatAdd(BOT_CLS&&BOT_CLS[from]||"trump",getP(from)?.name||from,a.text);
+  }else if(a.type==="MODE"){GAME_MODE=a.mode;updateModeBadge&&updateModeBadge()}
+  else if(a.type==="END_TURN"){STATE.turn++;document.getElementById("turn-info")&&(document.getElementById("turn-info").textContent="DEGEN CASINO · TURN "+STATE.turn)}
+  else if(a.type==="PUMP"){const cell=document.querySelector(`[data-pos="${a.id}"]`);if(cell)cell.classList.add("pumping");const sq=SQ.find(s=>s.id===a.id);if(sq)eventAdd&&eventAdd("moon","🚀",`<b>${sq.n}</b> pumped by <b>${getP(from)?.name||from}</b>`)}
+  else if(a.type==="DUMP"){const cell=document.querySelector(`[data-pos="${a.id}"]`);if(cell){cell.classList.remove("pumping");cell.classList.add("dumping")}const sq=SQ.find(s=>s.id===a.id);if(sq)eventAdd&&eventAdd("rekt","💀",`<b>${sq.n}</b> dumped by <b>${getP(from)?.name||from}</b>`)}
+  else if(a.type==="SKILL"){chatAdd&&chatAdd("skill","SYS",`⚡ ${getP(from)?.name||from} ACTIVATED ${a.name} → ${a.fx}`)}
+  else if(a.type==="TRADE_OFFER"&&a.to===MY_SEAT){
+    const sq=SQ[a.prop];const fp=getP(a.from);
+    const m=document.createElement("div");m.className="card-modal";
+    m.innerHTML=`<div class="card-mo" style="--card-c:#FF1B8D"><div class="card-h">🤝 TRADE OFFER</div><div class="card-t">${fp?.name||a.from} → YOU</div><div class="card-d">Offers <b>${sq?.n||"?"}</b> for <b>$${a.ask}</b></div><div class="card-btns"><button class="card-btn go">ACCEPT</button><button class="card-btn skip">REJECT</button></div></div>`;
+    document.body.appendChild(m);
+    m.querySelector(".card-btn.go").onclick=()=>{addToast&&addToast("✅ TRADE ACCEPTED");m.remove();const reply={type:"TRADE_RESULT",from:a.from,to:MY_SEAT,result:"accepted",prop:a.prop};mqttSend(reply);channel?.postMessage({action:reply,from:MY_SEAT,t:Date.now()})};
+    m.querySelector(".card-btn.skip").onclick=()=>{addToast&&addToast("❌ TRADE REJECTED");m.remove();const reply={type:"TRADE_RESULT",from:a.from,to:MY_SEAT,result:"rejected"};mqttSend(reply);channel?.postMessage({action:reply,from:MY_SEAT,t:Date.now()})};
+  }else if(a.type==="TRADE_RESULT"&&a.from===MY_SEAT){addToast&&addToast(`🤝 TRADE ${a.result.toUpperCase()}`)}
+}
+
+/* Override broadcast to also publish via MQTT */
+const _origBroadcast3=window.__broadcast;
+window.__broadcast=function(action){
+  if(action.type==="STATE_SYNC")action.seats=Array.from(SEATS_TAKEN);
+  channel?.postMessage({action,from:MY_SEAT,t:Date.now()});
+  mqttSend(action);
+};
+
+/* Re-bind channel to use unified handler */
+if(typeof channel!=="undefined"&&channel){
+  channel.onmessage=function(e){
+    const{action,from}=e.data;if(from===MY_SEAT)return;
+    handleRemoteUnified(action,from);
+  };
+}
+
+function waitForMQTT(){if(window.mqtt)initMQTT();else setTimeout(waitForMQTT,300)}
+setTimeout(waitForMQTT,600);
+
+setInterval(()=>{if(_mqttClient&&_mqttClient.connected)mqttSend({type:"HELLO"})},8000);
+
+console.log("[v29] MQTT P2P sync layer loaded");
 
 </script>
 </body></html>
